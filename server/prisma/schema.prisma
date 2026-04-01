@@ -1,0 +1,42 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  books     Book[]
+}
+
+model Book {
+  id        String     @id @default(cuid())
+  title     String
+  roomId    String
+  userId    String
+  user      User       @relation(fields: [userId], references: [id])
+  createdAt DateTime   @default(now())
+  pages     BookPage[]
+  leaderboard String?
+  bgmSrc    String?
+}
+
+model BookPage {
+  id       String @id @default(cuid())
+  bookId   String
+  book     Book   @relation(fields: [bookId], references: [id])
+  pageNum  Int
+  objects  String // JSON stringified canvas objects
+  audioSrc String?
+  bgmSrc   String?
+}

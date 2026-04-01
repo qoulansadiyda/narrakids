@@ -1,0 +1,13 @@
+# dependencies
+node_modules
+client/node_modules
+
+# next build
+.next
+client/.next
+
+# env
+.env
+
+# mac
+.DS_Store
