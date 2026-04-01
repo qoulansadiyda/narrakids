@@ -7,12 +7,12 @@ const nextConfig: NextConfig = {
       {
         // Menyembunyikan IPv4 asli di belakang Vercel agar tidak diblokir HTTPS browser
         source: '/api/:path*',
-        destination: 'http://202.155.91.75/:path*'
+        destination: 'http://202.155.91.75:4000/:path*'
       },
       {
         // Mengalihkan koneksi real-time Socket.io
         source: '/socket.io/:path*',
-        destination: 'http://202.155.91.75/socket.io/:path*'
+        destination: 'http://202.155.91.75:4000/socket.io/:path*'
       }
     ]
   }
