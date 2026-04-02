@@ -24,8 +24,9 @@ export function getSocket(): Socket {
     const token = getToken();
     const payload = decodeTokenPayload(token);
 
-    const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:4000";
-    const s = io(`${SOCKET_URL}/collab`, {
+    const rawUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:4000";
+    // Mencegah error "//collab" jika env diset "/"
+    const s = io(rawUrl === "/" ? "/collab" : `${rawUrl.replace(/\/$/, "")}/collab`, {
       auth: {
         token,
         userId: payload?.sub ?? "",
