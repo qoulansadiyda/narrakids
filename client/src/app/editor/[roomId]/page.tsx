@@ -1394,24 +1394,35 @@ export default function EditorPage() {
             <div className="flex-1 overflow-hidden" style={{ minHeight: "400px" }}>
               <AssetLibrary
                 onPick={async (category, index) => {
-                  if (viewingHistorySpread) { await showAlert("Ngintip buku dulu ya! Tutup layarnya di area bawah untuk nambahin karakter! 👀"); return; }
-                  const c = getCanvasBySide(editableSideRef.current);
-                  if (!c) return;
+                  try {
+                    if (viewingHistorySpread) { await showAlert("Ngintip buku dulu ya! 👀"); return; }
+                    const c = getCanvasBySide(editableSideRef.current);
+                    if (!c) {
+                      await showAlert("Kanvas belum siap, coba lagi.");
+                      return;
+                    }
 
-                  if (!isMyTurnRef.current) { await showAlert("Sabar ya, ini bukan giliran kamu 🙂"); return; }
+                    if (!isMyTurnRef.current) { await showAlert("Sabar ya, ini bukan giliran kamu 🙂"); return; }
 
-                  const asset = (ASSET_REGISTRY as any)[category]?.[index];
-                  if (!asset) return;
+                    const asset = (ASSET_REGISTRY as any)[category]?.[index];
+                    if (!asset) {
+                       await showAlert("Asset tidak ditemukan di registry!");
+                       return;
+                    }
 
-                  await addAssetToCanvas({
-                    canvas: c,
-                    asset,
-                    canEdit: isMyTurnRef.current,
-                  });
+                    await addAssetToCanvas({
+                      canvas: c,
+                      asset,
+                      canEdit: isMyTurnRef.current,
+                    });
 
-                  applyInteractivity(c, isMyTurnRef.current);
-                  c.requestRenderAll();
-                  (c as any)._sendUpdate?.();
+                    applyInteractivity(c, isMyTurnRef.current);
+                    c.requestRenderAll();
+                    (c as any)._sendUpdate?.();
+                  } catch (err: any) {
+                    console.error("onPick Error:", err);
+                    await showAlert(`Error saat menambahkan aset: ${err.message || String(err)}`);
+                  }
                 }}
                 onPickAudio={async (category, assetId, src) => {
                   if (viewingHistorySpread) { await showAlert("Ngintip buku dulu ya! 👀"); return; }
