@@ -182,15 +182,26 @@ export function attachRealtime(io) {
       if (r.users.size >= r.max)
         return cb && cb({ ok: false, error: "ROOM_FULL", max: r.max });
 
-      // Validasi: 1 akun = 1 slot (tidak boleh buka 2 tab masuk sama-sama)
-      const activeUsers = Array.from(r.users.values());
-      if (activeUsers.some((u) => u.userId === userId)) {
-        return cb && cb({ ok: false, error: "ALREADY_IN_ROOM" });
+      // Jika React strict mode "double-fire" pada socket yang SAMA, skip & sukseskan
+      if (r.users.has(socket.id)) {
+        const snap = snapshot(roomId);
+        return cb && cb({ ok: true, snapshot: snap, you: socket.id });
       }
 
-      // Validasi: nama display tidak boleh ada yang menduplikasi (untuk mempermudah identifikasi chat dll)
-      if (activeUsers.some((u) => u.username === username)) {
-        return cb && cb({ ok: false, error: "NAME_TAKEN" });
+      // Validasi: 1 akun = 1 slot 
+      const activeEntries = Array.from(r.users.entries());
+      const oldSocketEntry = activeEntries.find(([sid, u]) => u.userId === userId);
+      
+      if (oldSocketEntry) {
+         // Solusi elegan: Kick koneksi tab lama agar proses masuk di tab baru / refresh langsung mulus
+         const oldSid = oldSocketEntry[0];
+         r.users.delete(oldSid);
+         NS.to(oldSid).emit("room:kicked", { reason: "Kamu telah membuka sesi ini di perangkat atau tab baru." });
+      } else {
+         // Cuma periksa nama ganda jika ini user dengan ID berbeda
+         if (activeEntries.some(([sid, u]) => u.username === username)) {
+           return cb && cb({ ok: false, error: "NAME_TAKEN" });
+         }
       }
 
       r.users.set(socket.id, { userId, username });

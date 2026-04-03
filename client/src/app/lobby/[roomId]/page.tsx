@@ -60,10 +60,15 @@ export default function Lobby() {
       stayInRoomRef.current = true;
       router.push(`/editor/${roomId}`);
     };
+    const onKicked = async ({ reason }: { reason: string }) => {
+      await showAlert(`⛔ ${reason}`);
+      router.replace("/app");
+    };
 
     socket.on("room:state", onState);
     socket.on("room:joined", onJoined);
     socket.on("room:start", onStart);
+    socket.on("room:kicked", onKicked);
 
     const doJoin = () => {
       if (roomId === "new") {
@@ -86,12 +91,6 @@ export default function Lobby() {
           // ❌ Room tidak ada
           if (resp?.error === "ROOM_NOT_FOUND") {
             await showAlert("Room ID tidak ditemukan. Cek kodenya atau buat baru yuk!");
-            router.replace("/app");
-            return;
-          }
-
-          if (resp?.error === "ALREADY_IN_ROOM") {
-            await showAlert("Satu akun cuma bisa mengisi satu bangku. Kamu terdeteksi sedang berada di ruang ini (mungkin dari tab/perangkat lain).");
             router.replace("/app");
             return;
           }
@@ -139,6 +138,7 @@ export default function Lobby() {
       socket.off("room:state", onState);
       socket.off("room:joined", onJoined);
       socket.off("room:start", onStart);
+      socket.off("room:kicked", onKicked);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId]);
