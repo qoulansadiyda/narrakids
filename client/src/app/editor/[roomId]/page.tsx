@@ -872,13 +872,6 @@ export default function EditorPage() {
     s.on("canvas:transform", handleRemoteTransform);
     s.on("turn:timer", handleTimer);
     s.on("room:finished", handleRoomFinished);
-    
-    const handleKicked = async ({ reason }: { reason: string }) => {
-      s.disconnect();
-      await showAlert(`Oops! ${reason} 🦊`);
-      router.replace("/app");
-    };
-    s.on("error:kicked", handleKicked);
 
     s.emit("turn:get", { roomId }, (resp: any) => {
       if (resp?.ok && resp.snapshot) handleTurnChanged(resp.snapshot);
@@ -1394,39 +1387,24 @@ export default function EditorPage() {
             <div className="flex-1 overflow-hidden" style={{ minHeight: "400px" }}>
               <AssetLibrary
                 onPick={async (category, index) => {
-                  try {
-                    if (viewingHistorySpread) { await showAlert("Ngintip buku dulu ya! 👀"); return; }
-                    const c = getCanvasBySide(editableSideRef.current);
-                    if (!c) {
-                      await showAlert("Kanvas belum siap, coba lagi.");
-                      return;
-                    }
+                  if (viewingHistorySpread) { await showAlert("Ngintip buku dulu ya! Tutup layarnya di area bawah untuk nambahin karakter! 👀"); return; }
+                  const c = getCanvasBySide(editableSideRef.current);
+                  if (!c) return;
 
-                    if (!isMyTurnRef.current) { await showAlert("Sabar ya, ini bukan giliran kamu 🙂"); return; }
+                  if (!isMyTurnRef.current) { await showAlert("Sabar ya, ini bukan giliran kamu 🙂"); return; }
 
-                    const asset = (ASSET_REGISTRY as any)[category]?.[index];
-                    if (!asset) {
-                       await showAlert("Asset tidak ditemukan di registry!");
-                       return;
-                    }
+                  const asset = (ASSET_REGISTRY as any)[category]?.[index];
+                  if (!asset) return;
 
-                    const fabricModule = await import("fabric");
-                    const fabric: any = (fabricModule as any).fabric || (fabricModule as any).default || (fabricModule as any);
+                  await addAssetToCanvas({
+                    canvas: c,
+                    asset,
+                    canEdit: isMyTurnRef.current,
+                  });
 
-                    await addAssetToCanvas({
-                      fabric,
-                      canvas: c,
-                      asset,
-                      canEdit: isMyTurnRef.current,
-                    });
-
-                    applyInteractivity(c, isMyTurnRef.current);
-                    c.requestRenderAll();
-                    (c as any)._sendUpdate?.();
-                  } catch (err: any) {
-                    console.error("onPick Error:", err);
-                    await showAlert(`Error saat menambahkan aset: ${err.message || String(err)}`);
-                  }
+                  applyInteractivity(c, isMyTurnRef.current);
+                  c.requestRenderAll();
+                  (c as any)._sendUpdate?.();
                 }}
                 onPickAudio={async (category, assetId, src) => {
                   if (viewingHistorySpread) { await showAlert("Ngintip buku dulu ya! 👀"); return; }
@@ -1460,11 +1438,7 @@ export default function EditorPage() {
                         defaultScale: 0.5,
                       };
 
-                      const fabricModule = await import("fabric");
-                      const fabric: any = (fabricModule as any).fabric || (fabricModule as any).default || (fabricModule as any);
-
                       await addAssetToCanvas({
-                        fabric,
                         canvas: c,
                         asset: base64Asset,
                         canEdit: isMyTurnRef.current,

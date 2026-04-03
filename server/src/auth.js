@@ -57,5 +57,43 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+router.put('/profile', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ error: 'Tidak ada akses token' });
+    const tokenPart = authHeader.split(' ')[1];
+    if (!tokenPart) return res.status(401).json({ error: 'Format token salah' });
+
+    let payload;
+    try {
+      payload = jwt.verify(tokenPart, SECRET);
+    } catch {
+      return res.status(401).json({ error: 'Token sudah kedaluwarsa, silakan login ulang' });
+    }
+
+    const { newUsername } = req.body || {};
+    if (!newUsername || newUsername.length < 3) {
+      return res.status(400).json({ error: 'Nama pengguna baru minimal 3 karakter' });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: payload.sub },
+      data: { username: newUsername }
+    });
+
+    const newToken = jwt.sign(
+      { sub: updatedUser.id, username: updatedUser.username },
+      SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({ ok: true, token: newToken, username: updatedUser.username });
+  } catch (e) {
+    if (e.code === 'P2002') {
+      return res.status(409).json({ error: 'Nama identitas ini sudah terpakai oleh pemain lain' });
+    }
+    res.status(500).json({ error: 'Database error' });
+  }
+});
 
 export default router;

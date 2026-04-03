@@ -103,6 +103,7 @@ export function attachRealtime(io) {
       users: [...r.users].map(([sid, u]) => ({ sid, ...u })),
       canStart: r.users.size >= r.min,
       isFull: r.users.size >= r.max,
+      settings: r.settings || {},
     };
   }
 
@@ -129,7 +130,7 @@ export function attachRealtime(io) {
     if (!userId) userId = randomUUID();
     if (!username) username = `user-${userId.slice(0, 4)}`;
 
-    console.log("[IO] connected", socket.id, "as", username, "userId=", userId, "tokenPresent=", !!token);
+    console.log("[IO] connected", socket.id, "as", username);
 
     // ===== TURN: GET =====
     socket.on("turn:get", ({ roomId }, cb) => {
@@ -181,43 +182,19 @@ export function attachRealtime(io) {
       if (r.users.size >= r.max)
         return cb && cb({ ok: false, error: "ROOM_FULL", max: r.max });
 
-      // 1. Skip if this exact socket.id is already registered
-      // (Edge case: Frontend router.replace() causes room:join right after room:create on the same socket)
-      if (r.users.has(socket.id)) {
-        console.log(`[IO]   ⚠ socket.id already in room, returning current state silently`);
-        const snap = snapshot(roomId);
-        return cb && cb({ ok: true, snapshot: snap, you: socket.id });
+      // Validasi: 1 akun = 1 slot (tidak boleh buka 2 tab masuk sama-sama)
+      const activeUsers = Array.from(r.users.values());
+      if (activeUsers.some((u) => u.userId === userId)) {
+        return cb && cb({ ok: false, error: "ALREADY_IN_ROOM" });
       }
 
-      // 2. EVICT old socket if the same userId tries to join again
-      console.log(`[IO] room:join attempt | room=${roomId} sid=${socket.id} userId=${userId} username=${username}`);
-      for (const [existingSid, u] of r.users) {
-        if (u.userId === userId) {
-          console.log(`[IO]   ⚠ EVICTING old socket sid=${existingSid} for userId=${userId} to allow new join`);
-          
-          const wasHost = (r.hostId === existingSid);
-          const wasCurrentTurn = (r.started && r.currentTurnUserId === existingSid);
-          
-          const oldSocket = NS.sockets.get(existingSid);
-          if (oldSocket) {
-             oldSocket.emit("error:kicked", { reason: "Sesi dipindahkan! Kamu login dari tab lain." });
-             // Disconnecting triggers the global "disconnect" event which modifies r.hostId!
-             oldSocket.disconnect(true);
-          }
-          r.users.delete(existingSid);
-          
-          // Re-apply host and turn because oldSocket.disconnect() might have cleared them
-          if (wasHost || !r.hostId) r.hostId = socket.id; 
-          if (wasCurrentTurn) {
-             r.turnOrder = (r.turnOrder || []).map(id => id === existingSid ? socket.id : id);
-             r.currentTurnUserId = socket.id;
-          }
-        }
+      // Validasi: nama display tidak boleh ada yang menduplikasi (untuk mempermudah identifikasi chat dll)
+      if (activeUsers.some((u) => u.username === username)) {
+        return cb && cb({ ok: false, error: "NAME_TAKEN" });
       }
 
       r.users.set(socket.id, { userId, username });
       socket.join(roomId);
-      console.log(`[IO]   ✅ joined room=${roomId} total=${r.users.size}`);
 
       const snap = snapshot(roomId);
       NS.to(roomId).emit("room:state", snap);
@@ -290,6 +267,17 @@ export function attachRealtime(io) {
       r.hostId = targetSid;
       NS.to(roomId).emit("room:state", snapshot(roomId));
       cb && cb({ ok: true });
+    });
+
+    // ===== ROOM: SETTINGS UPDATE (Live Sync) =====
+    socket.on("room:settings_update", ({ roomId, settings }) => {
+      const r = rooms.get(roomId);
+      if (!r) return;
+      if (r.started) return; // tidak bisa ganti pengaturan setelah mulai
+      if (r.hostId !== socket.id) return; // hanya ketua yang bisa merubah
+
+      r.settings = { ...(r.settings || {}), ...settings };
+      NS.to(roomId).emit("room:state", snapshot(roomId));
     });
 
     // ===== DISCONNECT =====
@@ -523,40 +511,20 @@ export function attachRealtime(io) {
         if (!r.scores) r.scores = {};
         if (!r.scores[currentSid]) r.scores[currentSid] = 0;
         
-        const normalized = normalizeObjects(r.currentObjects || []);
-        const { score, present } = computeTurnScore(normalized);
-        r.scores[currentSid] += score;
-
         r.panels.push({
           id: randomUUID().slice(0, 8),
           turnNumber: r.turnNumber ?? 0,
           createdBy: currentSid,
-          objects: normalized,
-          score: score,
-          presentCategories: present,
-          skipped: true, // denotes timeout
+          objects: r.currentObjects || [], // save whatever they had
+          score: 0,
+          presentCategories: [],
+          skipped: true,
           timestamp: Date.now(),
           updatedAt: Date.now(),
         });
 
-        // Simpan versi normalized ini juga ke draft
-        if (!r.panelDrafts) r.panelDrafts = {};
-        const key = String(r.turnNumber ?? 0);
-        r.panelDrafts[key] = {
-          objects: normalized,
-          updatedAt: Date.now(),
-          by: currentSid,
-        };
-
         const leaderboard = buildLeaderboard(r.scores, r.users);
         NS.to(roomId).emit("score:update", { leaderboard });
-        
-        // Note: Send explicit timeout to user so they can display their score!
-        NS.to(currentSid).emit("turn:timeout_score", {
-          score,
-          totalScore: r.scores[currentSid],
-          present,
-        });
 
         checkRoomFinished(roomId);
       }, r.settings.turnDuration * 1000);

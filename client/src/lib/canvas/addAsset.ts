@@ -1,21 +1,17 @@
-import { ASSET_REGISTRY } from "../assets/registry";
+import { ASSET_REGISTRY } from "./registry";
 
 export async function addAssetToCanvas(opts: {
-  fabric: any;
   canvas: any;
   asset: any;
   canEdit: boolean;
 }) {
-  const { fabric, canvas, asset, canEdit } = opts;
-  if (!fabric || !canvas || !asset) return;
+  const { canvas, asset, canEdit } = opts;
+  if (!canvas || !asset) return;
 
-  return new Promise<void>(async (resolve, reject) => {
-    try {
-      if (!fabric || !fabric.Image) {
-        console.error("Fabric parameter is missing or invalid!");
-        alert("Sistem Canvas Error: Tidak ada instance fabric.");
-        return resolve();
-      }
+  const fabricModule = await import("fabric");
+  const fabric: any = (fabricModule as any).fabric || (fabricModule as any).default || (fabricModule as any);
+
+  return new Promise<void>((resolve) => {
     if (asset.category === "bubble_text") {
       fabric.Image.fromURL(asset.src, (img: any) => {
         img.scale(asset.defaultScale ?? 0.5);
@@ -104,13 +100,9 @@ export async function addAssetToCanvas(opts: {
         if (canEdit && asset.category !== "background") {
           canvas.setActiveObject(img);
         }
+        canvas.requestRenderAll();
         resolve();
       });
-    }
-    } catch (err) {
-      console.error("Error adding asset to canvas:", err);
-      alert("Gagal menambahkan aset. Cek koneksi atau muat ulang halaman.");
-      resolve();
     }
   });
 }

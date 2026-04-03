@@ -16,6 +16,7 @@ type State = {
   started: boolean;
   users: User[];
   canStart: boolean; // server-side
+  settings?: any;
 };
 
 export default function Lobby() {
@@ -37,6 +38,14 @@ export default function Lobby() {
   useEffect(() => {
     const onState = (s: State) => {
       setState(s);
+      
+      // Sinkronisasi data form dari Host ke pemain lain
+      if (s.settings && s.hostId !== socket.id) {
+         if (s.settings.bookTitle !== undefined) setBookTitle(s.settings.bookTitle);
+         if (s.settings.turnDuration !== undefined) setTurnDuration(s.settings.turnDuration);
+         if (s.settings.canvasQuota !== undefined) setCanvasQuota(s.settings.canvasQuota);
+      }
+
       console.log("[CLIENT] room:state", {
         roomId: s.roomId,
         users: s.users.length,
@@ -81,6 +90,18 @@ export default function Lobby() {
             return;
           }
 
+          if (resp?.error === "ALREADY_IN_ROOM") {
+            await showAlert("Satu akun cuma bisa mengisi satu bangku. Kamu terdeteksi sedang berada di ruang ini (mungkin dari tab/perangkat lain).");
+            router.replace("/app");
+            return;
+          }
+
+          if (resp?.error === "NAME_TAKEN") {
+            await showAlert("Display Name kamu kebetulan sama persis dengan pemain lain yang ada di ruangan ini. Ganti nama profilmu dulu yuk!");
+            router.replace("/app");
+            return;
+          }
+
           // ❌ Room sudah penuh
           if (resp?.error === "ROOM_FULL") {
             await showAlert(`Room sudah penuh.\nMaksimal pemain: ${resp.max ?? 4}. Silakan buat room baru atau join room lain.`);
@@ -95,25 +116,11 @@ export default function Lobby() {
             return;
           }
 
-          // ❌ Akun (User ID) sudah ada di dalam room (Task 1: Duplicate Player Check)
-          if (resp?.error === "ALREADY_JOINED") {
-            await showAlert("Akun kamu sudah / sedang aktif di ruangan ini (Mungkin di tab lain). Tidak boleh masuk ganda! 🦊");
-            router.replace("/app");
-            return;
-          }
-
           // Hanya kalau gagal karena alasan lain (misal delay koneksi) baru retry
           if (!resp?.ok) setTimeout(doJoin, 300);
         });
       }
     };
-
-    const onKicked = async ({ reason }: { reason: string }) => {
-      socket.disconnect(); // prevent auto-reconnect loops
-      await showAlert(`Oops! ${reason} 🦊`);
-      router.replace("/app");
-    };
-    socket.on("error:kicked", onKicked);
 
     if (socket.connected) doJoin();
     else {
@@ -132,7 +139,6 @@ export default function Lobby() {
       socket.off("room:state", onState);
       socket.off("room:joined", onJoined);
       socket.off("room:start", onStart);
-      socket.off("error:kicked", onKicked);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId]);
@@ -140,6 +146,19 @@ export default function Lobby() {
   const [turnDuration, setTurnDuration] = useState<number>(0);
   const [canvasQuota, setCanvasQuota] = useState<number>(2);
   const [bookTitle, setBookTitle] = useState<string>("");
+
+  // Sinkronisasi otomatis dari Host ke Server setiap kali Host mengganti/mengetik pengaturan
+  useEffect(() => {
+    if (state && me && state.hostId === me && socket.connected) {
+      const timer = setTimeout(() => {
+        socket.emit("room:settings_update", { 
+          roomId: state.roomId, 
+          settings: { turnDuration, canvasQuota, bookTitle } 
+        });
+      }, 500); 
+      return () => clearTimeout(timer);
+    }
+  }, [turnDuration, canvasQuota, bookTitle, state?.hostId, me, socket, state?.roomId]);
 
   if (!state) {
     return (
