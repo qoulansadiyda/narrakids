@@ -196,7 +196,15 @@ export function attachRealtime(io) {
          // Solusi elegan: Kick koneksi tab lama agar proses masuk di tab baru / refresh langsung mulus
          const oldSid = oldSocketEntry[0];
          r.users.delete(oldSid);
+         
+         // Jika yang tertendang adalah ketua (Host), pindahkan mahkotanya ke tab yang baru ini!
+         if (r.hostId === oldSid) {
+             r.hostId = socket.id;
+         }
+
+         // Kirim sinyal tendang, lalu putuskan paksa agar benar-benar keluar dari room broadcast
          NS.to(oldSid).emit("room:kicked", { reason: "Kamu telah membuka sesi ini di perangkat atau tab baru." });
+         NS.sockets.get(oldSid)?.leave(roomId);
       } else {
          // Cuma periksa nama ganda jika ini user dengan ID berbeda
          if (activeEntries.some(([sid, u]) => u.username === username)) {
