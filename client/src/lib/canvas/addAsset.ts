@@ -8,10 +8,16 @@ export async function addAssetToCanvas(opts: {
   const { canvas, asset, canEdit } = opts;
   if (!canvas || !asset) return;
 
-  const fabricModule = await import("fabric");
-  const fabric: any = (fabricModule as any).fabric || (fabricModule as any).default || (fabricModule as any);
+  return new Promise<void>(async (resolve, reject) => {
+    try {
+      const fabricModule = await import("fabric");
+      const fabric: any = (fabricModule as any).fabric || (fabricModule as any).default || (fabricModule as any);
 
-  return new Promise<void>((resolve) => {
+      if (!fabric || !fabric.Image) {
+        console.error("Fabric failed to load properly!", fabricModule);
+        alert("Sistem Canvas Error: Tidak dapat memuat module fabric. Coba muat ulang halaman.");
+        return resolve();
+      }
     if (asset.category === "bubble_text") {
       fabric.Image.fromURL(asset.src, (img: any) => {
         img.scale(asset.defaultScale ?? 0.5);
@@ -100,9 +106,13 @@ export async function addAssetToCanvas(opts: {
         if (canEdit && asset.category !== "background") {
           canvas.setActiveObject(img);
         }
-        canvas.requestRenderAll();
         resolve();
       });
+    }
+    } catch (err) {
+      console.error("Error adding asset to canvas:", err);
+      alert("Gagal menambahkan aset. Cek koneksi atau muat ulang halaman.");
+      resolve();
     }
   });
 }
