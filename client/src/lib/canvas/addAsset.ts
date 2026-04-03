@@ -1,21 +1,19 @@
 import { ASSET_REGISTRY } from "../assets/registry";
 
 export async function addAssetToCanvas(opts: {
+  fabric: any;
   canvas: any;
   asset: any;
   canEdit: boolean;
 }) {
-  const { canvas, asset, canEdit } = opts;
-  if (!canvas || !asset) return;
+  const { fabric, canvas, asset, canEdit } = opts;
+  if (!fabric || !canvas || !asset) return;
 
   return new Promise<void>(async (resolve, reject) => {
     try {
-      const fabricModule = await import("fabric");
-      const fabric: any = (fabricModule as any).fabric || (fabricModule as any).default || (fabricModule as any);
-
       if (!fabric || !fabric.Image) {
-        console.error("Fabric failed to load properly!", fabricModule);
-        alert("Sistem Canvas Error: Tidak dapat memuat module fabric. Coba muat ulang halaman.");
+        console.error("Fabric parameter is missing or invalid!");
+        alert("Sistem Canvas Error: Tidak ada instance fabric.");
         return resolve();
       }
     if (asset.category === "bubble_text") {

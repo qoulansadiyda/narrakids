@@ -1410,7 +1410,11 @@ export default function EditorPage() {
                        return;
                     }
 
+                    const fabricModule = await import("fabric");
+                    const fabric: any = (fabricModule as any).fabric || (fabricModule as any).default || (fabricModule as any);
+
                     await addAssetToCanvas({
+                      fabric,
                       canvas: c,
                       asset,
                       canEdit: isMyTurnRef.current,
@@ -1456,7 +1460,11 @@ export default function EditorPage() {
                         defaultScale: 0.5,
                       };
 
+                      const fabricModule = await import("fabric");
+                      const fabric: any = (fabricModule as any).fabric || (fabricModule as any).default || (fabricModule as any);
+
                       await addAssetToCanvas({
+                        fabric,
                         canvas: c,
                         asset: base64Asset,
                         canEdit: isMyTurnRef.current,
