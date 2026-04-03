@@ -1,4 +1,4 @@
-import { ASSET_REGISTRY } from "./registry";
+import { ASSET_REGISTRY } from "../assets/registry";
 
 export async function addAssetToCanvas(opts: {
   canvas: any;
