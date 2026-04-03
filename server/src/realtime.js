@@ -181,6 +181,13 @@ export function attachRealtime(io) {
       if (r.users.size >= r.max)
         return cb && cb({ ok: false, error: "ROOM_FULL", max: r.max });
 
+      // Block duplicate users
+      for (const [, u] of r.users) {
+        if (u.userId === userId) {
+          return cb && cb({ ok: false, error: "ALREADY_JOINED" });
+        }
+      }
+
       r.users.set(socket.id, { userId, username });
       socket.join(roomId);
 
@@ -488,20 +495,40 @@ export function attachRealtime(io) {
         if (!r.scores) r.scores = {};
         if (!r.scores[currentSid]) r.scores[currentSid] = 0;
         
+        const normalized = normalizeObjects(r.currentObjects || []);
+        const { score, present } = computeTurnScore(normalized);
+        r.scores[currentSid] += score;
+
         r.panels.push({
           id: randomUUID().slice(0, 8),
           turnNumber: r.turnNumber ?? 0,
           createdBy: currentSid,
-          objects: r.currentObjects || [], // save whatever they had
-          score: 0,
-          presentCategories: [],
-          skipped: true,
+          objects: normalized,
+          score: score,
+          presentCategories: present,
+          skipped: true, // denotes timeout
           timestamp: Date.now(),
           updatedAt: Date.now(),
         });
 
+        // Simpan versi normalized ini juga ke draft
+        if (!r.panelDrafts) r.panelDrafts = {};
+        const key = String(r.turnNumber ?? 0);
+        r.panelDrafts[key] = {
+          objects: normalized,
+          updatedAt: Date.now(),
+          by: currentSid,
+        };
+
         const leaderboard = buildLeaderboard(r.scores, r.users);
         NS.to(roomId).emit("score:update", { leaderboard });
+        
+        // Note: Send explicit timeout to user so they can display their score!
+        NS.to(currentSid).emit("turn:timeout_score", {
+          score,
+          totalScore: r.scores[currentSid],
+          present,
+        });
 
         checkRoomFinished(roomId);
       }, r.settings.turnDuration * 1000);

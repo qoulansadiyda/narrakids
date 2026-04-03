@@ -336,7 +336,18 @@ export default function BookViewerPage() {
   // Helper to evaluate and play BGM for a given page index
   const evaluateBgm = (pageIndex: number) => {
     if (!book) return;
-    const targetBgm = book.pages[pageIndex]?.bgmSrc || book.pages[pageIndex + 1]?.bgmSrc;
+    let targetBgm = book.pages[pageIndex]?.bgmSrc || book.pages[pageIndex + 1]?.bgmSrc;
+    
+    // Task 3 BGM Autoplay: If no bgmSrc is found on this page, and nothing is playing,
+    // grab the first BGM found anywhere in the book to act as the global BGM starting from page 0.
+    if (!targetBgm) {
+      if (bgmAudioRef.current?.src) {
+        targetBgm = bgmAudioRef.current.src;
+      } else {
+        const firstBgmPage = book.pages.find(p => p.bgmSrc);
+        if (firstBgmPage) targetBgm = firstBgmPage.bgmSrc;
+      }
+    }
     
     // If there is a target BGM and it's DIFFERENT from currently playing track
     if (targetBgm && targetBgm !== bgmAudioRef.current?.src) {

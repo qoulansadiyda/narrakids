@@ -67,15 +67,25 @@ function rotateSelected(canvas: any, angle: number, sendUpdate: () => void) {
   sendUpdate();
 }
 
+
 function flipSelected(canvas: any, axis: "x" | "y", sendUpdate: () => void) {
   const obj = canvas?.getActiveObject?.();
   if (!obj) return;
   if (obj?.data?.category === "background") return;
-  if (axis === "x") obj.set("flipX", !obj.flipX);
-  else obj.set("flipY", !obj.flipY);
+  
+  if (obj.data?.category === "bubble_text" && obj.type === "group") {
+    const img = (obj as any).item(0);
+    if (img) {
+       img.set(axis === "x" ? "flipX" : "flipY", !img[axis === "x" ? "flipX" : "flipY"]);
+    }
+  } else {
+    if (axis === "x") obj.set("flipX", !obj.flipX);
+    else obj.set("flipY", !obj.flipY);
+  }
   canvas.requestRenderAll?.();
   sendUpdate();
 }
+
 
 function bringForwardSelected(canvas: any, sendUpdate: () => void) {
   const obj = canvas?.getActiveObject?.();
@@ -141,6 +151,7 @@ export default function EditorPage() {
   const spreadWrapRef = useRef<HTMLDivElement | null>(null);
 
   const [pageSize, setPageSize] = useState<{ w: number; h: number }>({ w: 520, h: 390 });
+  const [canvasScale, setCanvasScale] = useState<number>(1);
 
   // ── Auth gate ──
   useEffect(() => {
@@ -155,6 +166,7 @@ export default function EditorPage() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const [leaderboard, setLeaderboard] = useState<LeaderboardRow[]>([]);
+  const [bookTitle, setBookTitle] = useState<string>('');
   const [panels, setPanels] = useState<Panel[]>([]);
 
   // ── Audio state ──
@@ -430,13 +442,10 @@ export default function EditorPage() {
       const containerW = el.clientWidth;
       if (!containerW) return;
 
-      let w = Math.floor((containerW - SPREAD_GAP) / 2);
-      w = Math.max(260, w);
-
-      // We no longer set dynamic logical pageSize. Logical is fixed to 520x390.
-      // But we can store the calculated responsive size to pass to wrapper if we want,
-      // or just handle it via CSS. We'll stick to a fixed logical size to prevent layout breaks.
-      // We will set CSS zoom based on reference 520w.
+      const marginMobile = window.innerWidth < 768 ? 16 : 48;
+      const maxW = Math.max(280, containerW - marginMobile);
+      const scale = Math.min(1, maxW / pageSize.w);
+      setCanvasScale(scale);
     };
 
     compute();
@@ -647,7 +656,41 @@ export default function EditorPage() {
         return;
       }
 
+      
+      // Duplicate: Ctrl+D
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "d") {
+        e.preventDefault();
+        const c = getCanvasBySide(editableSideRef.current);
+        if (!c || !isMyTurn) return;
+        const active = c.getActiveObject();
+        if (!active || active?.data?.category === "background") return;
+        
+        active.clone((cloned: any) => {
+          c.discardActiveObject();
+          cloned.set({
+            left: (cloned.left || 0) + 20,
+            top: (cloned.top || 0) + 20,
+            evented: true,
+            selectable: true
+          });
+          if (cloned.type === 'activeSelection') {
+            cloned.canvas = c;
+            cloned.forEachObject((obj: any) => c.add(obj));
+            cloned.setCoords();
+          } else {
+            cloned.data = JSON.parse(JSON.stringify(active.data || {}));
+            c.add(cloned);
+          }
+          c.setActiveObject(cloned);
+          c.requestRenderAll();
+          (c as any)._sendUpdate?.();
+          saveHistoryState(c);
+        });
+        return;
+      }
+
       // Delete: Delete or Backspace
+
       if (e.key === "Delete" || e.key === "Backspace") {
         e.preventDefault();
 
@@ -739,6 +782,10 @@ export default function EditorPage() {
 
       setCurrentTurnUsername(name);
 
+      if (snapshot.settings && snapshot.settings.bookTitle) {
+        setBookTitle(snapshot.settings.bookTitle);
+      }
+
       // 🔑 Reset undo/redo stacks on every turn change so history is scoped to the current panel only
       undoStackRef.current = [];
       redoStackRef.current = [];
@@ -812,6 +859,14 @@ export default function EditorPage() {
 
     s.on("turn:changed", handleTurnChanged);
     s.on("score:update", handleScoreUpdate);
+    s.on("turn:timeout_score", async (payload: any) => {
+      await import("@/components/DialogProvider").then(m => m.useDialog).then(() => {
+           console.log("Timeout score", payload);
+      });
+      showAlert(`Waktu Habis! Panel disimpan.\nSkor kamu turn ini: +${payload.score}\nTotal skormu sekarang: ${payload.totalScore}`);
+      setCurrentPageSfx(null);
+      setCurrentPageBgm(null);
+    });
     s.on("canvas:update:rejected", handleRejected);
     s.on("canvas:update", handleRemoteCanvasUpdate);
     s.on("canvas:transform", handleRemoteTransform);
@@ -1249,7 +1304,7 @@ export default function EditorPage() {
         <div className="flex items-center gap-3">
           <span className="text-4xl bg-sky-100 p-2 rounded-full border-2 border-sky-300">🦊</span>
           <div>
-            <h1 className="text-2xl font-black text-sky-600 drop-shadow-sm leading-none">Ruang Karya</h1>
+            <h1 className="text-2xl font-black text-sky-600 drop-shadow-sm leading-none">{bookTitle || "Ruang Karya"}</h1>
             <p className="font-bold text-slate-400 text-xs mt-1 uppercase tracking-widest">KODE: {roomId}</p>
           </div>
         </div>
@@ -1406,7 +1461,7 @@ export default function EditorPage() {
 
         <div className="flex-1 min-w-0">
           <div ref={spreadWrapRef} className="w-full">
-            <div className="flex items-start" style={{ gap: SPREAD_GAP }}>
+            <div className="flex flex-wrap items-start justify-center" style={{ gap: SPREAD_GAP }}>
               <div style={{ position: "relative" }}>
                 <div className={`text-sm font-medium mb-2 ${editableSide === "left" && isMyTurn ? "text-purple-600" : ""}`}>
                   Left Page {viewingHistorySpread && <span className="ml-2 text-xs font-normal text-amber-600 bg-amber-100 px-2 py-0.5 rounded">History Preview</span>}
@@ -1414,10 +1469,10 @@ export default function EditorPage() {
 
                 <div
                   ref={leftWrapRef}
-                  style={{ width: pageSize.w, height: pageSize.h, position: "relative" }}
+                  style={{ width: pageSize.w * canvasScale, height: pageSize.h * canvasScale, position: "relative" }}
                   className={`border rounded overflow-visible ${editableSide === "left" && !viewingHistorySpread ? "ring-4 ring-purple-600 border-transparent bg-white shadow-lg" : "bg-white"}`}
                 >
-                  <canvas id="left-canvas" />
+                  <div style={{ transform: `scale(${canvasScale})`, transformOrigin: "top left", width: pageSize.w, height: pageSize.h }}><canvas id="left-canvas" /></div>
                   {/* Floating toolbar for left canvas */}
                   {floatingToolbar.visible && floatingToolbar.side === "left" && isMyTurn && (
                     <FloatingToolbar
@@ -1495,10 +1550,10 @@ export default function EditorPage() {
 
                 <div
                   ref={rightWrapRef}
-                  style={{ width: pageSize.w, height: pageSize.h, position: "relative" }}
+                  style={{ width: pageSize.w * canvasScale, height: pageSize.h * canvasScale, position: "relative" }}
                   className={`border rounded overflow-visible ${editableSide === "right" && !viewingHistorySpread ? "ring-4 ring-purple-600 border-transparent bg-white shadow-lg" : "bg-white"}`}
                 >
-                  <canvas id="right-canvas" />
+                  <div style={{ transform: `scale(${canvasScale})`, transformOrigin: "top left", width: pageSize.w, height: pageSize.h }}><canvas id="right-canvas" /></div>
                   {/* Floating toolbar for right canvas */}
                   {floatingToolbar.visible && floatingToolbar.side === "right" && isMyTurn && (
                     <FloatingToolbar

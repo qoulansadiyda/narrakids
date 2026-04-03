@@ -95,6 +95,13 @@ export default function Lobby() {
             return;
           }
 
+          // ❌ Akun (User ID) sudah ada di dalam room (Task 1: Duplicate Player Check)
+          if (resp?.error === "ALREADY_JOINED") {
+            await showAlert("Akun kamu sudah / sedang aktif di ruangan ini (Mungkin di tab lain). Tidak boleh masuk ganda! 🦊");
+            router.replace("/app");
+            return;
+          }
+
           // Hanya kalau gagal karena alasan lain (misal delay koneksi) baru retry
           if (!resp?.ok) setTimeout(doJoin, 300);
         });
