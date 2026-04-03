@@ -872,6 +872,13 @@ export default function EditorPage() {
     s.on("canvas:transform", handleRemoteTransform);
     s.on("turn:timer", handleTimer);
     s.on("room:finished", handleRoomFinished);
+    
+    const handleKicked = async ({ reason }: { reason: string }) => {
+      s.disconnect();
+      await showAlert(`Oops! ${reason} 🦊`);
+      router.replace("/app");
+    };
+    s.on("error:kicked", handleKicked);
 
     s.emit("turn:get", { roomId }, (resp: any) => {
       if (resp?.ok && resp.snapshot) handleTurnChanged(resp.snapshot);

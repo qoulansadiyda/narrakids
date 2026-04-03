@@ -108,6 +108,13 @@ export default function Lobby() {
       }
     };
 
+    const onKicked = async ({ reason }: { reason: string }) => {
+      socket.disconnect(); // prevent auto-reconnect loops
+      await showAlert(`Oops! ${reason} 🦊`);
+      router.replace("/app");
+    };
+    socket.on("error:kicked", onKicked);
+
     if (socket.connected) doJoin();
     else {
       const once = () => {
@@ -125,6 +132,7 @@ export default function Lobby() {
       socket.off("room:state", onState);
       socket.off("room:joined", onJoined);
       socket.off("room:start", onStart);
+      socket.off("error:kicked", onKicked);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId]);
