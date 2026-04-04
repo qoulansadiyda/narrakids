@@ -178,8 +178,12 @@ export function attachRealtime(io) {
       const r = rooms.get(roomId);
       if (!r) return cb && cb({ ok: false, error: "ROOM_NOT_FOUND" });
 
-      if (r.started) return cb && cb({ ok: false, error: "ALREADY_STARTED" });
-      if (r.users.size >= r.max)
+      const activeEntries = Array.from(r.users.entries());
+      const oldSocketEntry = activeEntries.find(([sid, u]) => u.userId === userId);
+
+      // Block jika bukan pemain yang sedang reconnect, dan sesi sudah main atau penuh
+      if (r.started && !oldSocketEntry) return cb && cb({ ok: false, error: "ALREADY_STARTED" });
+      if (r.users.size >= r.max && !oldSocketEntry)
         return cb && cb({ ok: false, error: "ROOM_FULL", max: r.max });
 
       // Jika React strict mode "double-fire" pada socket yang SAMA, skip & sukseskan
@@ -188,12 +192,8 @@ export function attachRealtime(io) {
         return cb && cb({ ok: true, snapshot: snap, you: socket.id });
       }
 
-      // Validasi: 1 akun = 1 slot 
-      const activeEntries = Array.from(r.users.entries());
-      const oldSocketEntry = activeEntries.find(([sid, u]) => u.userId === userId);
-      
       if (oldSocketEntry) {
-         // Solusi elegan: Kick koneksi tab lama agar proses masuk di tab baru / refresh langsung mulus
+         // Solusi elegan: Ganti socket lama dengan yang baru. Super berguna untuk Refresh tab / putus koneksi Polling
          const oldSid = oldSocketEntry[0];
          r.users.delete(oldSid);
          
@@ -202,8 +202,17 @@ export function attachRealtime(io) {
              r.hostId = socket.id;
          }
 
+         // Selamatkan rekam jejak gilirannya agar canvas tetap bisa dipakai!
+         if (r.turnOrder) {
+            const idx = r.turnOrder.indexOf(oldSid);
+            if (idx !== -1) r.turnOrder[idx] = socket.id;
+         }
+         if (r.currentTurnUserId === oldSid) {
+            r.currentTurnUserId = socket.id;
+         }
+
          // Kirim sinyal tendang, lalu putuskan paksa agar benar-benar keluar dari room broadcast
-         NS.to(oldSid).emit("room:kicked", { reason: "Kamu telah membuka sesi ini di perangkat atau tab baru." });
+         NS.to(oldSid).emit("room:kicked", { reason: "Kamu telah merefresh halaman atau masuk dari perangkat lain." });
          NS.sockets.get(oldSid)?.leave(roomId);
       } else {
          // Cuma periksa nama ganda jika ini user dengan ID berbeda

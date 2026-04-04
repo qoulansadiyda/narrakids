@@ -719,10 +719,25 @@ export default function EditorPage() {
     const handleConnect = () => {
       setMySocketId(s.id ?? null);
       console.log("[CLIENT] editor connected with id", s.id);
+      
+      // Sangat krusial jika user reconnect via Long-Polling atau Vercel drop socket
+      s.emit("room:join", { roomId }, async (resp: any) => {
+        if (!resp?.ok && resp?.error === "ROOM_NOT_FOUND") {
+          await showAlert("Permainan di ruangan ini sudah ditutup!");
+          router.replace("/app");
+        }
+      });
+    };
+
+    const handleKicked = async ({ reason }: { reason: string }) => {
+      await showAlert(`⛔ ${reason}`);
+      router.replace("/app");
     };
 
     if (s.connected) handleConnect();
     else s.on("connect", handleConnect);
+    
+    s.on("room:kicked", handleKicked);
 
     const emitAsync = <T,>(event: string, payload: any) =>
       new Promise<T>((resolve) => s.emit(event, payload, (resp: T) => resolve(resp)));
@@ -880,6 +895,7 @@ export default function EditorPage() {
 
     return () => {
       s.off("connect", handleConnect);
+      s.off("room:kicked", handleKicked);
       s.off("turn:changed", handleTurnChanged);
       s.off("score:update", handleScoreUpdate);
       s.off("canvas:update:rejected", handleRejected);
