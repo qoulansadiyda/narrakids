@@ -725,7 +725,14 @@ export default function EditorPage() {
         if (!resp?.ok && resp?.error === "ROOM_NOT_FOUND") {
           await showAlert("Permainan di ruangan ini sudah ditutup!");
           router.replace("/app");
+          return;
         }
+
+        // Ambil pembaruan status giliran, karena ID Socket kita baru, jadi kita ambil turnOrder yg sudah ter-update
+        // Peringatan ini krusial: Memastikan kita tidak salah meyakini giliran
+        s.emit("turn:get", { roomId }, (respT: any) => {
+           if (respT?.ok && respT.snapshot) handleTurnChanged(respT.snapshot);
+        });
       });
     };
 
@@ -1486,9 +1493,9 @@ export default function EditorPage() {
                 <div
                   ref={leftWrapRef}
                   style={{ width: pageSize.w * canvasScale, height: pageSize.h * canvasScale, position: "relative" }}
-                  className={`border rounded overflow-visible ${editableSide === "left" && !viewingHistorySpread ? "ring-4 ring-purple-600 border-transparent bg-white shadow-lg" : "bg-white"}`}
+                  className={`border rounded overflow-hidden ${editableSide === "left" && !viewingHistorySpread ? "ring-4 ring-purple-600 border-transparent bg-white shadow-lg" : "bg-white"}`}
                 >
-                  <div style={{ transform: `scale(${canvasScale})`, transformOrigin: "top left", width: pageSize.w, height: pageSize.h }}><canvas id="left-canvas" /></div>
+                  <canvas id="left-canvas" />
                   {/* Floating toolbar for left canvas */}
                   {floatingToolbar.visible && floatingToolbar.side === "left" && isMyTurn && (
                     <FloatingToolbar
@@ -1567,9 +1574,9 @@ export default function EditorPage() {
                 <div
                   ref={rightWrapRef}
                   style={{ width: pageSize.w * canvasScale, height: pageSize.h * canvasScale, position: "relative" }}
-                  className={`border rounded overflow-visible ${editableSide === "right" && !viewingHistorySpread ? "ring-4 ring-purple-600 border-transparent bg-white shadow-lg" : "bg-white"}`}
+                  className={`border rounded overflow-hidden ${editableSide === "right" && !viewingHistorySpread ? "ring-4 ring-purple-600 border-transparent bg-white shadow-lg" : "bg-white"}`}
                 >
-                  <div style={{ transform: `scale(${canvasScale})`, transformOrigin: "top left", width: pageSize.w, height: pageSize.h }}><canvas id="right-canvas" /></div>
+                  <canvas id="right-canvas" />
                   {/* Floating toolbar for right canvas */}
                   {floatingToolbar.visible && floatingToolbar.side === "right" && isMyTurn && (
                     <FloatingToolbar
