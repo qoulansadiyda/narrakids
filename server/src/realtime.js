@@ -215,8 +215,7 @@ export function attachRealtime(io) {
             r.currentTurnUserId = socket.id;
          }
 
-         // Kirim sinyal tendang, lalu putuskan paksa agar benar-benar keluar dari room broadcast
-         NS.to(oldSid).emit("room:kicked", { reason: "Kamu telah merefresh halaman atau masuk dari perangkat lain." });
+         // Putuskan paksa agar benar-benar keluar dari room broadcast
          NS.sockets.get(oldSid)?.leave(roomId);
       } else {
          // Cuma periksa nama ganda jika ini user dengan ID berbeda

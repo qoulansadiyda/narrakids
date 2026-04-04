@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "fabric": "^6.9.0",
-    "jspdf": "^3.0.4"
+    "jspdf": "^3.0.4",
+    "playwright": "^1.59.1"
   }
 }
