@@ -34,7 +34,13 @@ export async function addAssetToCanvas(opts: {
       const ch = typeof canvas.getHeight === "function" ? canvas.getHeight() : (canvas.height || 390);
 
       if (asset.category === "bubble_text") {
-        img.scale(asset.defaultScale ?? 0.5);
+        let sc = asset.defaultScale ?? 0.5;
+        const maxBW = cw * 0.6;
+        const maxBH = ch * 0.6;
+        const sX = maxBW / img.width;
+        const sY = maxBH / img.height;
+        const safeScale = Math.min(sc, sX, sY);
+        img.scale(safeScale);
 
         const groupW = img.getScaledWidth();
         const groupH = img.getScaledHeight();
@@ -76,12 +82,12 @@ export async function addAssetToCanvas(opts: {
         resolve();
 
       } else {
-        const sc = asset.defaultScale ?? 0.5;
+        let sc = asset.defaultScale ?? 0.5;
 
         if (asset.category === "background") {
           const sX = cw / img.width;
           const sY = ch / img.height;
-          const sCover = Math.max(sX, sY);
+          const sCover = Math.max(sX, sY); // Aspect cover
           img.set({
             scaleX: sCover,
             scaleY: sCover,
@@ -93,9 +99,16 @@ export async function addAssetToCanvas(opts: {
             evented: false,
           });
         } else {
+          // Bounding box protection for stickers & characters
+          const maxW = cw * 0.8;
+          const maxH = ch * 0.8;
+          const sX = maxW / img.width;
+          const sY = maxH / img.height;
+          const safeScale = Math.min(sc, sX, sY);
+
           img.set({
-            scaleX: sc,
-            scaleY: sc,
+            scaleX: safeScale,
+            scaleY: safeScale,
             left: cw / 2,
             top: ch / 2,
             originX: "center",

@@ -65,18 +65,10 @@ async function renderObjectsToDataUrl(opts: {
     if (obj) obj.data = (objects as any[])[i]?.data;
   });
 
-  // Magic auto-normalize for legacy objects (books created on smaller/different canvases)
-  let globalScale = 1;
+  // Force background to COVER the entire canvas (aspect-fill) and be perfectly centered
   const bgObj = enlivened.find((o: any) => o && o.data && o.data.category === "background");
   
   if (bgObj) {
-    const sw = bgObj.width! * bgObj.scaleX!;
-    // Calculate global scale strictly based on width to map old coordinates to 520
-    if (Math.abs(sw - nativeWidth) > 5) {
-      globalScale = nativeWidth / sw;
-    }
-
-    // Force background to COVER the entire canvas (aspect-fill) and be perfectly centered
     const coverScale = Math.max(nativeWidth / bgObj.width!, nativeHeight / bgObj.height!);
     bgObj.set({
       originX: "center",
@@ -92,16 +84,6 @@ async function renderObjectsToDataUrl(opts: {
   for (const obj of enlivened) {
     if (!obj) continue;
     const anyObj = obj as any;
-
-    if (anyObj.data?.category !== "background" && globalScale !== 1) {
-      anyObj.set({
-        scaleX: (anyObj.scaleX || 1) * globalScale,
-        scaleY: (anyObj.scaleY || 1) * globalScale,
-        left: (anyObj.left || 0) * globalScale,
-        top: (anyObj.top || 0) * globalScale,
-      });
-      anyObj.setCoords();
-    }
 
     c.add(anyObj);
 
@@ -212,17 +194,10 @@ const PageCanvas = forwardRef<HTMLDivElement, { objects: any[]; width: number; h
             if (obj) obj.data = (objects as any[])[i]?.data;
           });
           
-          // Magic auto-normalize for legacy objects
-          let globalScale = 1;
+          // Force background to COVER the entire canvas (aspect-fill) and be perfectly centered
           const bgObj = enlivened.find((o: any) => o && o.data && o.data.category === "background");
           
           if (bgObj) {
-            const sw = bgObj.width! * bgObj.scaleX!;
-            if (Math.abs(sw - 520) > 5) {
-              globalScale = 520 / sw;
-            }
-
-            // Force background to COVER the entire canvas (aspect-fill) and be perfectly centered
             const coverScale = Math.max(520 / bgObj.width!, 390 / bgObj.height!);
             bgObj.set({
               originX: "center",
@@ -238,16 +213,6 @@ const PageCanvas = forwardRef<HTMLDivElement, { objects: any[]; width: number; h
           for (const obj of enlivened) {
             if (!obj) continue;
             
-            if (obj.data?.category !== "background" && globalScale !== 1) {
-              obj.set({
-                scaleX: (obj.scaleX || 1) * globalScale,
-                scaleY: (obj.scaleY || 1) * globalScale,
-                left: (obj.left || 0) * globalScale,
-                top: (obj.top || 0) * globalScale,
-              });
-              obj.setCoords();
-            }
-
             staticCanvas.add(obj);
             if (obj.data?.category === "background") {
               if (typeof staticCanvas.sendObjectToBack === "function")
