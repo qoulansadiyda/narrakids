@@ -537,21 +537,25 @@ export function attachRealtime(io) {
       NS.to(roomId).emit("turn:timer", { durationSec: r.settings.turnDuration });
 
       r.turnTimer = setTimeout(() => {
-        // Auto-skip
+        // Auto-finish when time is up
         const currentSid = r.currentTurnUserId;
         if (!currentSid) return;
 
         if (!r.scores) r.scores = {};
         if (!r.scores[currentSid]) r.scores[currentSid] = 0;
         
+        const normalized = normalizeObjects(r.currentObjects || []);
+        const { score, present } = computeTurnScore(normalized);
+        r.scores[currentSid] += score;
+        
         r.panels.push({
           id: randomUUID().slice(0, 8),
           turnNumber: r.turnNumber ?? 0,
           createdBy: currentSid,
-          objects: r.currentObjects || [], // save whatever they had
-          score: 0,
-          presentCategories: [],
-          skipped: true,
+          objects: normalized,
+          score: score,
+          presentCategories: present,
+          skipped: false, // it's not a skip, it's just timeout finish
           timestamp: Date.now(),
           updatedAt: Date.now(),
         });

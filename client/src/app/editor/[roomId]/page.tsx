@@ -656,7 +656,6 @@ export default function EditorPage() {
         return;
       }
 
-      
       // Duplicate: Ctrl+D
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "d") {
         e.preventDefault();
@@ -665,7 +664,7 @@ export default function EditorPage() {
         const active = c.getActiveObject();
         if (!active || active?.data?.category === "background") return;
         
-        active.clone((cloned: any) => {
+        const handleClone = (cloned: any) => {
           c.discardActiveObject();
           cloned.set({
             left: (cloned.left || 0) + 20,
@@ -685,7 +684,13 @@ export default function EditorPage() {
           c.requestRenderAll();
           (c as any)._sendUpdate?.();
           saveHistoryState(c);
-        });
+        };
+
+        const cloneResult = active.clone(handleClone);
+        // Fallback for Fabric 6+ where clone() returns a Promise
+        if (cloneResult && typeof cloneResult.then === 'function') {
+          cloneResult.then(handleClone);
+        }
         return;
       }
 
