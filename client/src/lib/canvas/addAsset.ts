@@ -11,15 +11,32 @@ export async function addAssetToCanvas(opts: {
   const fabricModule = await import("fabric");
   const fabric: any = (fabricModule as any).fabric || (fabricModule as any).default || (fabricModule as any);
 
-  return new Promise<void>((resolve) => {
-    if (asset.category === "bubble_text") {
-      fabric.Image.fromURL(asset.src, (img: any) => {
+  return new Promise<void>(async (resolve) => {
+    try {
+      let img: any;
+      if (fabric.Image?.fromURL) {
+        img = await new Promise((res) => fabric.Image.fromURL(asset.src, res));
+      } else if (fabric.FabricImage?.fromURL) {
+        img = await fabric.FabricImage.fromURL(asset.src);
+      } else if (fabric.util?.loadImage) {
+        const el = await fabric.util.loadImage(asset.src);
+        img = new fabric.FabricImage(el);
+      } else {
+        throw new Error("Unsupported Fabric version for loading images.");
+      }
+
+      if (!img) return resolve();
+
+      // Fallback dimensi kanvas agar terhindar dari NaN (bila setDimensions dihapus)
+      const cw = typeof canvas.getWidth === "function" ? canvas.getWidth() : (canvas.width || 520);
+      const ch = typeof canvas.getHeight === "function" ? canvas.getHeight() : (canvas.height || 390);
+
+      if (asset.category === "bubble_text") {
         img.scale(asset.defaultScale ?? 0.5);
 
         const groupW = img.getScaledWidth();
         const groupH = img.getScaledHeight();
 
-        // TASK 6: Font default size increased from 18 to 28 for better proportion
         const text = new fabric.Textbox("Ketik di sini", {
           fontSize: 28,
           fontFamily: "Nunito",
@@ -34,7 +51,6 @@ export async function addAssetToCanvas(opts: {
           selectable: canEdit,
         });
 
-        // Posisi Image agar origin di tengah juga untuk Textbox
         img.set({
           originX: "center",
           originY: "center",
@@ -43,8 +59,8 @@ export async function addAssetToCanvas(opts: {
         });
 
         const grp = new fabric.Group([img, text], {
-          left: canvas.width / 2,
-          top: canvas.height / 2,
+          left: cw / 2,
+          top: ch / 2,
           originX: "center",
           originY: "center",
           subTargetCheck: true,
@@ -56,21 +72,19 @@ export async function addAssetToCanvas(opts: {
         if (canEdit) canvas.setActiveObject(grp);
         canvas.requestRenderAll();
         resolve();
-      });
-    } else {
-      fabric.Image.fromURL(asset.src, (img: any) => {
+
+      } else {
         const sc = asset.defaultScale ?? 0.5;
-        // Background scale to cover canvas
+
         if (asset.category === "background") {
-          const sX = canvas.width / img.width;
-          const sY = canvas.height / img.height;
-          // cover
+          const sX = cw / img.width;
+          const sY = ch / img.height;
           const sCover = Math.max(sX, sY);
           img.set({
             scaleX: sCover,
             scaleY: sCover,
-            left: canvas.width / 2,
-            top: canvas.height / 2,
+            left: cw / 2,
+            top: ch / 2,
             originX: "center",
             originY: "center",
             selectable: false,
@@ -79,8 +93,8 @@ export async function addAssetToCanvas(opts: {
         } else {
           img.scale(sc);
           img.set({
-            left: canvas.width / 2,
-            top: canvas.height / 2,
+            left: cw / 2,
+            top: ch / 2,
             originX: "center",
             originY: "center",
             selectable: canEdit,
@@ -91,7 +105,6 @@ export async function addAssetToCanvas(opts: {
         img.data = { category: asset.category, id: asset.id };
 
         if (asset.category === "background") {
-          // ensure bg goes to back
           if (typeof canvas.sendToBack === "function") canvas.sendToBack(img);
           else if (typeof canvas.sendObjectToBack === "function") canvas.sendObjectToBack(img);
         }
@@ -102,7 +115,10 @@ export async function addAssetToCanvas(opts: {
         }
         canvas.requestRenderAll();
         resolve();
-      });
+      }
+    } catch (err) {
+      console.error("[addAssetToCanvas] Load failed:", err);
+      resolve();
     }
   });
 }

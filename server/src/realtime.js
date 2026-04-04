@@ -315,21 +315,20 @@ export function attachRealtime(io) {
     // ===== DISCONNECT =====
     socket.on("disconnect", () => {
       for (const [roomId, r] of rooms) {
-        if (!r.users.delete(socket.id)) continue;
+        const u = r.users.get(socket.id);
+        if (!u) continue;
 
-        if (r.hostId === socket.id) r.hostId = [...r.users.keys()][0] || null;
+        // Soft disconnect flag
+        u.disconnected = true;
 
-        if (r.started && r.currentTurnUserId === socket.id) {
-          r.turnOrder = (r.turnOrder || []).filter((sid) => sid !== socket.id);
-
-          if (r.turnOrder.length > 0) {
-            r.currentTurnIndex = r.currentTurnIndex % r.turnOrder.length;
-            r.currentTurnUserId = r.turnOrder[r.currentTurnIndex];
-            NS.to(roomId).emit("turn:changed", getTurnSnapshot(r));
-          } else {
-            r.currentTurnUserId = null;
-            r.turnOrder = [];
-          }
+        if (!r.started) {
+          // Normal lobby: delete instantly
+          r.users.delete(socket.id);
+          if (r.hostId === socket.id) r.hostId = [...r.users.keys()][0] || null;
+        } else {
+          // Active game: DON'T delete user and DON'T remove from turnOrder.
+          // Let turn:timer skip them when duration ends to avoid turn desync.
+          // They can reclaim their socket ID via room:join when they refresh!
         }
 
         NS.to(roomId).emit("room:state", snapshot(roomId));
