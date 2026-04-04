@@ -720,8 +720,14 @@ export default function EditorPage() {
       setMySocketId(s.id ?? null);
       console.log("[CLIENT] editor connected with id", s.id);
       
+      const authStr = localStorage.getItem("narrakids_auth");
+      if (!authStr) return;
+      
+      let authObj;
+      try { authObj = JSON.parse(authStr); } catch (e) { return; }
+
       // Sangat krusial jika user reconnect via Long-Polling atau Vercel drop socket
-      s.emit("room:join", { roomId }, async (resp: any) => {
+      s.emit("room:join", { roomId, userId: authObj.id, username: authObj.username }, async (resp: any) => {
         if (!resp?.ok && resp?.error === "ROOM_NOT_FOUND") {
           await showAlert("Permainan di ruangan ini sudah ditutup!");
           router.replace("/app");
