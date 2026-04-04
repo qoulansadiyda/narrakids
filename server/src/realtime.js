@@ -174,12 +174,16 @@ export function attachRealtime(io) {
     });
 
     // ===== ROOM: JOIN =====
-    socket.on("room:join", ({ roomId }, cb) => {
+    socket.on("room:join", (payload, cb) => {
+      const { roomId } = payload;
+      const currentUserId = payload.userId || userId;
+      const currentUsername = payload.username || username;
+
       const r = rooms.get(roomId);
       if (!r) return cb && cb({ ok: false, error: "ROOM_NOT_FOUND" });
 
       const activeEntries = Array.from(r.users.entries());
-      const oldSocketEntry = activeEntries.find(([sid, u]) => u.userId === userId);
+      const oldSocketEntry = activeEntries.find(([sid, u]) => u.userId === currentUserId);
 
       // Block jika bukan pemain yang sedang reconnect, dan sesi sudah main atau penuh
       if (r.started && !oldSocketEntry) return cb && cb({ ok: false, error: "ALREADY_STARTED" });
@@ -216,12 +220,12 @@ export function attachRealtime(io) {
          NS.sockets.get(oldSid)?.leave(roomId);
       } else {
          // Cuma periksa nama ganda jika ini user dengan ID berbeda
-         if (activeEntries.some(([sid, u]) => u.username === username)) {
+         if (activeEntries.some(([sid, u]) => u.username === currentUsername)) {
            return cb && cb({ ok: false, error: "NAME_TAKEN" });
          }
       }
 
-      r.users.set(socket.id, { userId, username });
+      r.users.set(socket.id, { userId: currentUserId, username: currentUsername });
       socket.join(roomId);
 
       const snap = snapshot(roomId);
