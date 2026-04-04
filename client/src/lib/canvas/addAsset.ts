@@ -14,16 +14,18 @@ export async function addAssetToCanvas(opts: {
   return new Promise<void>(async (resolve) => {
     try {
       let img: any;
-      if (fabric.Image?.fromURL) {
-        img = await new Promise((res) => fabric.Image.fromURL(asset.src, res));
-      } else if (fabric.FabricImage?.fromURL) {
-        img = await fabric.FabricImage.fromURL(asset.src);
-      } else if (fabric.util?.loadImage) {
-        const el = await fabric.util.loadImage(asset.src);
-        img = new fabric.FabricImage(el);
-      } else {
-        throw new Error("Unsupported Fabric version for loading images.");
-      }
+      const loadHtmlImage = (src: string) => new Promise<HTMLImageElement>((resolve, reject) => {
+        const imgEl = new window.Image();
+        imgEl.crossOrigin = "anonymous";
+        imgEl.onload = () => resolve(imgEl);
+        imgEl.onerror = () => reject(new Error("Failed to load image from " + src));
+        imgEl.src = src;
+      });
+
+      const el = await loadHtmlImage(asset.src);
+      // Mendukung Fabric 5 (fabric.Image) maupun Fabric 6+ (fabric.FabricImage)
+      const ImgClass = fabric.FabricImage || fabric.Image;
+      img = new ImgClass(el);
 
       if (!img) return resolve();
 
