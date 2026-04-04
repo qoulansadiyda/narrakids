@@ -952,9 +952,21 @@ export default function EditorPage() {
       if (!isMounted) return;
 
       if (!leftCanvasRef.current || !rightCanvasRef.current) {
-        const leftEl = document.getElementById("left-canvas") as HTMLCanvasElement | null;
-        const rightEl = document.getElementById("right-canvas") as HTMLCanvasElement | null;
-        if (!leftEl || !rightEl) return;
+        if (!leftWrapRef.current || !rightWrapRef.current) return;
+
+        let leftEl = document.getElementById("left-canvas") as HTMLCanvasElement | null;
+        if (!leftEl) {
+           leftEl = document.createElement("canvas");
+           leftEl.id = "left-canvas";
+           leftWrapRef.current.appendChild(leftEl);
+        }
+
+        let rightEl = document.getElementById("right-canvas") as HTMLCanvasElement | null;
+        if (!rightEl) {
+           rightEl = document.createElement("canvas");
+           rightEl.id = "right-canvas";
+           rightWrapRef.current.appendChild(rightEl);
+        }
 
         const bindToWrapper = (canvas: any, wrapper: HTMLDivElement) => {
           const applySize = () => {
@@ -1490,13 +1502,12 @@ export default function EditorPage() {
                 </div>
 
                 <div
-                  ref={leftWrapRef}
                   style={{ width: pageSize.w * canvasScale, height: pageSize.h * canvasScale, position: "relative" }}
                   className={`border rounded overflow-hidden ${editableSide === "left" && !viewingHistorySpread ? "ring-4 ring-purple-600 border-transparent bg-white shadow-lg" : "bg-white"}`}
                 >
                   <div 
+                    ref={leftWrapRef}
                     style={{ transform: `scale(${canvasScale})`, transformOrigin: "top left", width: pageSize.w, height: pageSize.h }}
-                    dangerouslySetInnerHTML={{ __html: '<canvas id="left-canvas"></canvas>' }}
                   />
                   {/* Floating toolbar for left canvas */}
                   {floatingToolbar.visible && floatingToolbar.side === "left" && isMyTurn && (
@@ -1574,13 +1585,12 @@ export default function EditorPage() {
                 </div>
 
                 <div
-                  ref={rightWrapRef}
                   style={{ width: pageSize.w * canvasScale, height: pageSize.h * canvasScale, position: "relative" }}
                   className={`border rounded overflow-hidden ${editableSide === "right" && !viewingHistorySpread ? "ring-4 ring-purple-600 border-transparent bg-white shadow-lg" : "bg-white"}`}
                 >
                   <div 
+                    ref={rightWrapRef}
                     style={{ transform: `scale(${canvasScale})`, transformOrigin: "top left", width: pageSize.w, height: pageSize.h }}
-                    dangerouslySetInnerHTML={{ __html: '<canvas id="right-canvas"></canvas>' }}
                   />
                   {/* Floating toolbar for right canvas */}
                   {floatingToolbar.visible && floatingToolbar.side === "right" && isMyTurn && (

@@ -91,8 +91,9 @@ export async function addAssetToCanvas(opts: {
             evented: false,
           });
         } else {
-          img.scale(sc);
           img.set({
+            scaleX: sc,
+            scaleY: sc,
             left: cw / 2,
             top: ch / 2,
             originX: "center",

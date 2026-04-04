@@ -231,6 +231,9 @@ export function attachRealtime(io) {
       NS.to(roomId).emit("room:state", snap);
       socket.emit("room:joined", { roomId, you: socket.id });
 
+      // Sangat krusial: Jika sesi sudah berjalan, umumkan ulang giliran terbaru kepada semua!
+      if (r.started) NS.to(roomId).emit("turn:changed", getTurnSnapshot(r));
+
       cb && cb({ ok: true, snapshot: snap, you: socket.id });
     });
 
