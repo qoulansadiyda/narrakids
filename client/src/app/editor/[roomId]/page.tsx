@@ -952,17 +952,10 @@ export default function EditorPage() {
 
         const bindToWrapper = (canvas: any, wrapper: HTMLDivElement) => {
           const applySize = () => {
-            const w = wrapper.clientWidth;
-            const h = wrapper.clientHeight;
-
-            // 🔑 FIX: logical width/height stays fixed at 520x390.
-            // Only change the CSS display size and the canvas zoom.
-            const scale = w / 520;
-            canvas.setDimensions({ width: "100%", height: "100%" }, { cssOnly: true });
-            canvas.setZoom(scale);
-
-            // Optional: resize background specifically if needed, but if it was added at 520x390 it will scale automatically with zoom.
-            canvas.requestRenderAll();
+             // 🔑 FIX: the wrapper shrinks dynamically via responsive maxW, but Fabric stays untouched!
+             // Browser akan otomatis 'Scale' ke bawah berkat div <div style={{ transform: scale(...) }}>.
+             // Jangan pernah me-resize Fabric. Set dimensions/zoom bisa merusak koordinat atau bikin dobel-scale!
+             canvas.requestRenderAll();
           };
 
           applySize();
@@ -1495,7 +1488,7 @@ export default function EditorPage() {
                   style={{ width: pageSize.w * canvasScale, height: pageSize.h * canvasScale, position: "relative" }}
                   className={`border rounded overflow-hidden ${editableSide === "left" && !viewingHistorySpread ? "ring-4 ring-purple-600 border-transparent bg-white shadow-lg" : "bg-white"}`}
                 >
-                  <canvas id="left-canvas" />
+                  <div style={{ transform: `scale(${canvasScale})`, transformOrigin: "top left", width: pageSize.w, height: pageSize.h }}><canvas id="left-canvas" /></div>
                   {/* Floating toolbar for left canvas */}
                   {floatingToolbar.visible && floatingToolbar.side === "left" && isMyTurn && (
                     <FloatingToolbar
@@ -1576,7 +1569,7 @@ export default function EditorPage() {
                   style={{ width: pageSize.w * canvasScale, height: pageSize.h * canvasScale, position: "relative" }}
                   className={`border rounded overflow-hidden ${editableSide === "right" && !viewingHistorySpread ? "ring-4 ring-purple-600 border-transparent bg-white shadow-lg" : "bg-white"}`}
                 >
-                  <canvas id="right-canvas" />
+                  <div style={{ transform: `scale(${canvasScale})`, transformOrigin: "top left", width: pageSize.w, height: pageSize.h }}><canvas id="right-canvas" /></div>
                   {/* Floating toolbar for right canvas */}
                   {floatingToolbar.visible && floatingToolbar.side === "right" && isMyTurn && (
                     <FloatingToolbar
