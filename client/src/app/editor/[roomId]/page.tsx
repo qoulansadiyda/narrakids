@@ -427,7 +427,12 @@ export default function EditorPage() {
       const c = getCanvasBySide(editableSideRef.current);
       const ao = c?.getActiveObject?.();
       const fabricTyping = !!ao?.isEditing;
-      return domTyping || fabricTyping;
+      if (fabricTyping) return true;
+      if (domTyping) {
+        if (el?.style?.opacity === "0" || el?.style?.position === "absolute" || el?.style?.position === "fixed") return false;
+        return true;
+      }
+      return false;
     } catch {
       return domTyping;
     }
