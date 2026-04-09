@@ -15,7 +15,7 @@ router.post('/register', async (req, res) => {
   try {
     const { username, password } = req.body || {};
     if (invalid(username, password)) {
-      return res.status(400).json({ error: 'Invalid input' });
+      return res.status(400).json({ error: 'Nama kamu masih kosong atau kata sandi kurang panjang (minimal 6 huruf)' });
     }
 
     const hashed = await argon2.hash(password, { type: argon2.argon2id });
@@ -37,14 +37,14 @@ router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body || {};
     if (invalid(username, password)) {
-      return res.status(400).json({ error: 'Invalid input' });
+      return res.status(400).json({ error: 'Data yang diisi belum lengkap' });
     }
 
     const user = await prisma.user.findUnique({ where: { username } });
-    if (!user) return res.status(401).json({ error: 'Invalid credentials' });
+    if (!user) return res.status(401).json({ error: 'Password kamu salah atau nama belum terdaftar' });
 
     const ok = await argon2.verify(user.password, password);
-    if (!ok) return res.status(401).json({ error: 'Invalid credentials' });
+    if (!ok) return res.status(401).json({ error: 'Password kamu salah' });
 
     const token = jwt.sign(
       { sub: user.id, username: user.username },
