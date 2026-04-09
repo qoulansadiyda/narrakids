@@ -115,41 +115,7 @@ export default function AppHome() {
     }
   };
 
-  const handleUpdateProfile = async () => {
-    const token = getToken();
-    let currentUsername = "";
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        currentUsername = payload.username || "";
-      } catch (e) {}
-    }
 
-    const newName = await showPrompt("Masukkan Display Name baru untuk profilmu:", currentUsername);
-    if (!newName || newName.trim() === "" || newName === currentUsername) return;
-
-    try {
-      const res = await fetch(`${API}/auth/profile`, {
-        method: "PUT",
-        headers: { 
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}` 
-        },
-        body: JSON.stringify({ newUsername: newName.trim() })
-      });
-      const data = await res.json();
-      if (data.ok) {
-        localStorage.setItem("token", data.token);
-        await showAlert("Identitas berhasil diubah menjadi: " + data.username);
-        window.location.reload();
-      } else {
-        await showAlert("Gagal merubah identitas: " + (data.error || "Pesan Kesalahan Tidak Diketahui"));
-      }
-    } catch (e) {
-      console.error(e);
-      await showAlert("Terjadi putus koneksi jaringan saat mencoba mengupdate profil.");
-    }
-  };
 
   // Helper function to pick a random color class based on book id
   const getCoverColor = (id: string) => {
@@ -175,9 +141,9 @@ export default function AppHome() {
           <div className="flex items-center gap-2 hidden sm:flex">
             <button
               className="font-bold text-indigo-500 hover:text-white bg-indigo-50 hover:bg-indigo-500 px-5 py-2.5 rounded-full transition-colors shadow-sm"
-              onClick={handleUpdateProfile}
+              onClick={() => router.push('/profile')}
             >
-              Ubah Identitas 👤
+              Pengaturan Akun ⚙️
             </button>
             <button
               className="font-bold text-rose-500 hover:text-white bg-rose-50 hover:bg-rose-500 px-5 py-2.5 rounded-full transition-colors shadow-sm"
@@ -297,9 +263,9 @@ export default function AppHome() {
         <div className="mt-8 flex flex-col gap-3 text-center sm:hidden">
           <button
             className="font-bold text-indigo-500 hover:text-white bg-indigo-50 hover:bg-indigo-500 px-6 py-3 rounded-full transition-colors shadow-sm w-full max-w-[200px] mx-auto"
-            onClick={handleUpdateProfile}
+            onClick={() => router.push('/profile')}
           >
-            Ubah Identitas 👤
+            Pengaturan Akun ⚙️
           </button>
           <button
             className="font-bold text-rose-500 hover:text-white bg-rose-50 hover:bg-rose-500 px-6 py-3 rounded-full transition-colors shadow-sm w-full max-w-[200px] mx-auto"

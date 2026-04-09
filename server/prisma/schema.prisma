@@ -24,7 +24,7 @@ model Book {
   title     String
   roomId    String
   userId    String
-  user      User       @relation(fields: [userId], references: [id])
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime   @default(now())
   pages     BookPage[]
   leaderboard String?
@@ -34,7 +34,7 @@ model Book {
 model BookPage {
   id       String @id @default(cuid())
   bookId   String
-  book     Book   @relation(fields: [bookId], references: [id])
+  book     Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
   pageNum  Int
   objects  String // JSON stringified canvas objects
   audioSrc String?

@@ -96,4 +96,65 @@ router.put('/profile', async (req, res) => {
   }
 });
 
+router.put('/profile/password', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ error: 'Tidak ada akses token' });
+    const tokenPart = authHeader.split(' ')[1];
+    if (!tokenPart) return res.status(401).json({ error: 'Format token salah' });
+
+    let payload;
+    try {
+      payload = jwt.verify(tokenPart, SECRET);
+    } catch {
+      return res.status(401).json({ error: 'Token sudah kedaluwarsa, silakan login ulang' });
+    }
+
+    const { oldPassword, newPassword } = req.body || {};
+    if (!oldPassword || !newPassword || newPassword.length < 6) {
+      return res.status(400).json({ error: 'Data tidak lengkap atau sandi baru terlalu pendek (minimal 6 karakter)' });
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: payload.sub } });
+    if (!user) return res.status(404).json({ error: 'Pengguna tidak ditemukan' });
+
+    const ok = await argon2.verify(user.password, oldPassword);
+    if (!ok) return res.status(401).json({ error: 'Kata sandi lama kamu salah nih!' });
+
+    const hashed = await argon2.hash(newPassword, { type: argon2.argon2id });
+    await prisma.user.update({
+      where: { id: payload.sub },
+      data: { password: hashed }
+    });
+
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+router.delete('/profile', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ error: 'Tidak ada akses token' });
+    const tokenPart = authHeader.split(' ')[1];
+    if (!tokenPart) return res.status(401).json({ error: 'Format token salah' });
+
+    let payload;
+    try {
+      payload = jwt.verify(tokenPart, SECRET);
+    } catch {
+      return res.status(401).json({ error: 'Token sudah kedaluwarsa, silakan login ulang' });
+    }
+
+    await prisma.user.delete({
+      where: { id: payload.sub }
+    });
+
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 export default router;
