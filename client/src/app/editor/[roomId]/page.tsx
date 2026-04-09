@@ -542,15 +542,14 @@ export default function EditorPage() {
       obj.selectable = false;
       obj.evented = false;
       obj.hoverCursor = "default";
-      // keep these stable
       if (obj?.data?.category === "bubble_text" && obj?.type === "group") {
-        obj.subTargetCheck = true;
-        obj.interactive = true;
+        obj.subTargetCheck = false;
+        obj.interactive = false;
         (obj._objects ?? []).forEach((ch: any) => {
           if (!ch) return;
-          // readonly: no typing
           ch.selectable = false;
           ch.evented = false;
+          ch.editable = false;
         });
       }
     });
@@ -630,8 +629,13 @@ export default function EditorPage() {
     c.renderOnAddRemove = prevRenderOnAdd;
 
     // ── Step 4: Apply interactivity and render once ──
-    if (side === editableSideRef.current) applyInteractivity(c, isMyTurnRef.current);
-    else applyReadonly(c);
+    if (viewingHistorySpreadRef.current) {
+      applyReadonly(c);
+    } else if (side === editableSideRef.current) {
+      applyInteractivity(c, isMyTurnRef.current);
+    } else {
+      applyReadonly(c);
+    }
 
     c.requestRenderAll();
     isSyncingRef.current = false;
@@ -1043,6 +1047,7 @@ export default function EditorPage() {
         const sendUpdate = () => {
           if (isSyncingRef.current) return;
           if (!isMyTurnRef.current) return;
+          if (viewingHistorySpreadRef.current) return;
 
           if (debounceTimer) clearTimeout(debounceTimer);
           debounceTimer = setTimeout(() => {
