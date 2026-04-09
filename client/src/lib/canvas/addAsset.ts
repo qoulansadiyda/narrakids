@@ -13,6 +13,33 @@ export async function addAssetToCanvas(opts: {
 
   return new Promise<void>(async (resolve) => {
     try {
+      // Fallback dimensi kanvas agar terhindar dari NaN (bila setDimensions dihapus)
+      const cw = typeof canvas.getWidth === "function" ? canvas.getWidth() : (canvas.width || 520);
+      const ch = typeof canvas.getHeight === "function" ? canvas.getHeight() : (canvas.height || 390);
+
+      // ── TEXT ONLY (tanpa gambar bubble) ──
+      if (asset.category === "bubble_text" && !asset.src) {
+        const text = new fabric.Textbox("Ketik di sini", {
+          fontSize: 32,
+          fontFamily: "Nunito",
+          fill: "#333333",
+          textAlign: "center",
+          width: cw * 0.5,
+          left: cw / 2,
+          top: ch / 2,
+          originX: "center",
+          originY: "center",
+          editable: canEdit,
+          selectable: canEdit,
+          evented: canEdit,
+        });
+        text.data = { category: asset.category, id: asset.id };
+        canvas.add(text);
+        if (canEdit) canvas.setActiveObject(text);
+        canvas.requestRenderAll();
+        return resolve();
+      }
+
       let img: any;
       const loadHtmlImage = (src: string) => new Promise<HTMLImageElement>((resolve, reject) => {
         const imgEl = new window.Image();
@@ -29,10 +56,6 @@ export async function addAssetToCanvas(opts: {
 
       if (!img) return resolve();
 
-      // Fallback dimensi kanvas agar terhindar dari NaN (bila setDimensions dihapus)
-      const cw = typeof canvas.getWidth === "function" ? canvas.getWidth() : (canvas.width || 520);
-      const ch = typeof canvas.getHeight === "function" ? canvas.getHeight() : (canvas.height || 390);
-
       if (asset.category === "bubble_text") {
         let sc = asset.defaultScale ?? 0.5;
         const maxBW = cw * 0.6;
@@ -45,16 +68,17 @@ export async function addAssetToCanvas(opts: {
         const groupW = img.getScaledWidth();
         const groupH = img.getScaledHeight();
 
+        // Posisi teks tepat di tengah bubble
         const text = new fabric.Textbox("Ketik di sini", {
           fontSize: 28,
           fontFamily: "Nunito",
           fill: "#000000",
           textAlign: "center",
-          width: groupW * 0.7,
+          width: groupW * 0.65,
           originX: "center",
           originY: "center",
-          left: groupW / 2,
-          top: groupH / 2,
+          left: 0,
+          top: 0,
           editable: canEdit,
           selectable: canEdit,
         });
@@ -62,8 +86,8 @@ export async function addAssetToCanvas(opts: {
         img.set({
           originX: "center",
           originY: "center",
-          left: groupW / 2,
-          top: groupH / 2,
+          left: 0,
+          top: 0,
         });
 
         const grp = new fabric.Group([img, text], {
