@@ -23,7 +23,11 @@ export default function LoginPage() {
       localStorage.setItem('token', data.token);
       router.push('/app');
     } catch (e: any) {
-      showAlert(e.message || 'Login gagal, coba periksa kembali sandinya ya!');
+      let errMsg = e.message;
+      if (errMsg && errMsg.toLowerCase().includes('invalid credentials')) {
+        errMsg = 'Ups, nama atau sandinya kurang tepat. Coba ingat-ingat lagi yuk! 🦊';
+      }
+      showAlert(errMsg || 'Login gagal, coba periksa kembali sandinya ya!');
     } finally {
       setLoading(false);
     }
