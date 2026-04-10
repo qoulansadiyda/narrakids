@@ -39,8 +39,12 @@ export const ASSET_REGISTRY: Record<AssetCategory, AssetItem[]> = {
   ],
   bubble_text: [
     { id: "bb-textonly", name: "Text Only", src: "", category: "bubble_text", defaultScale: 1 },
-    { id: "bb-speech-1", name: "Pixel", src: "/assets/bubble/bubble1_pixel.png", category: "bubble_text", defaultScale: 0.9 },
-    { id: "bb-speech-2", name: "Cloud", src: "/assets/bubble/bubble2_cloud.png", category: "bubble_text", defaultScale: 0.9 },
+    { id: "bb-speech-1", name: "Oval", src: "/assets/bubble/bubble1_oval.png", category: "bubble_text", defaultScale: 0.9 },
+    { id: "bb-speech-2", name: "Rectangel", src: "/assets/bubble/bubble2_rectangel.png", category: "bubble_text", defaultScale: 0.9 },
+    { id: "bb-speech-3", name: "Pixel", src: "/assets/bubble/bubble3_pixel.png", category: "bubble_text", defaultScale: 0.9 },
+    { id: "bb-speech-4", name: "Cloud", src: "/assets/bubble/bubble4_cloud.png", category: "bubble_text", defaultScale: 0.9 },
+    { id: "bb-speech-5", name: "Wood", src: "/assets/bubble/bubble5_wood.png", category: "bubble_text", defaultScale: 0.9 },
+    { id: "bb-speech-6", name: "Paper", src: "/assets/bubble/bubble6_paper.png", category: "bubble_text", defaultScale: 0.9 },
   ],
   bgm: [
     { id: "bgm-adventure", name: "Adventure", src: "/assets/audio/bgm-adventure.mp3", category: "bgm" },
