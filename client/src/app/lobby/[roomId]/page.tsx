@@ -193,6 +193,14 @@ export default function Lobby() {
       <div className="absolute bottom-20 right-10 text-6xl opacity-20 animate-pulse cursor-default">🐊</div>
       <div className="absolute top-1/4 right-1/4 text-4xl opacity-20 animate-spin-slow cursor-default">⭐</div>
 
+      {/* Back button */}
+      <button
+        onClick={() => router.replace('/app')}
+        className="absolute top-6 left-6 z-20 flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border-2 border-sky-100 text-slate-500 hover:text-sky-500 font-bold transition-colors"
+      >
+        ← Kembali
+      </button>
+
       <div className="w-full max-w-lg bg-white rounded-[2rem] shadow-xl border-4 border-sky-200 relative z-10 overflow-hidden flex flex-col">
         {/* Header Ticket */}
         <div className="bg-sky-400 p-6 text-center text-white relative">

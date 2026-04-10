@@ -34,6 +34,14 @@ export default function RegisterPage() {
       {/* Decors */}
       <div className="absolute top-10 right-10 text-6xl opacity-30 animate-pulse">🌟</div>
       <div className="absolute bottom-10 left-10 text-6xl opacity-30 animate-bounce">🦌</div>
+
+      {/* Back button */}
+      <button
+        onClick={() => router.push('/')}
+        className="absolute top-6 left-6 z-20 flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border-2 border-sky-100 text-slate-500 hover:text-sky-500 font-bold transition-colors"
+      >
+        ← Kembali
+      </button>
       
       <div className="bg-white max-w-sm w-full rounded-3xl p-8 border-4 border-sky-100 shadow-xl relative z-10 text-center">
         <img src="/assets/logo/logo-icon.png" alt="NarraKids" className="w-20 h-20 object-contain mx-auto mb-4" />
