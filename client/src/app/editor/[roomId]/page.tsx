@@ -1353,7 +1353,10 @@ export default function EditorPage() {
       {/* HEADER */}
       <header className="bg-white px-6 py-4 shadow-[0_4px_0_rgb(224,242,254)] border-b-4 border-sky-200 z-10 flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <img src="/assets/logo/logo-icon.png" alt="NarraKids" className="w-12 h-12 object-contain bg-sky-100 p-1.5 rounded-full border-2 border-sky-300" />
+          <button onClick={() => router.push("/app")} className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer" title="Kembali ke Beranda">
+            <span className="text-slate-400 text-xl font-black">←</span>
+            <img src="/assets/logo/logo-icon.png" alt="NarraKids" className="w-12 h-12 object-contain bg-sky-100 p-1.5 rounded-full border-2 border-sky-300" />
+          </button>
           <div>
             <h1 className="text-2xl font-black text-sky-600 drop-shadow-sm leading-none">{bookTitle || "Ruang Karya"}</h1>
             <p className="font-bold text-slate-400 text-xs mt-1 uppercase tracking-widest">KODE: {roomId}</p>
@@ -1702,9 +1705,7 @@ export default function EditorPage() {
                 </button>
               </div>
 
-              <button className="px-5 py-3 rounded-2xl bg-white border-4 border-slate-100 font-bold text-slate-500 hover:text-slate-700 hover:border-slate-200 transition-colors shadow-sm active:translate-y-1 active:shadow-none" onClick={() => router.push("/app")}>
-                ← Balik ke Menu
-              </button>
+
 
               <div className="flex-1" />
 
