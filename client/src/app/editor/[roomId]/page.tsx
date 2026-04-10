@@ -135,7 +135,7 @@ export default function EditorPage() {
   const { roomId } = useParams() as { roomId: string };
   const router = useRouter();
   const socket: Socket = getSocket();
-  const { showAlert } = useDialog();
+  const { showAlert, showConfirm } = useDialog();
 
   const leftCanvasRef = useRef<any>(null);
   const rightCanvasRef = useRef<any>(null);
@@ -1249,6 +1249,8 @@ export default function EditorPage() {
 
   const handleSkip = async () => {
     if (!isMyTurn) { await showAlert("Sabar ya, ini bukan giliran kamu 🙂"); return; }
+    const confirmed = await showConfirm("Yakin mau melewati giliranmu? Kamu tidak akan mendapat poin (0 poin) untuk giliran ini lho! 😱");
+    if (!confirmed) return;
     socket.emit("turn:skip", { roomId }, async (resp: any) => {
       if (!resp?.ok) await showAlert(`Gagal melewati giliran: ${resp?.error ?? "UNKNOWN"}`);
     });
