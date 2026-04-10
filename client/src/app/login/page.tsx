@@ -36,10 +36,11 @@ export default function LoginPage() {
   return (
     <main className="min-h-screen bg-orange-50 flex items-center justify-center p-6 font-nunito relative overflow-hidden">
       {/* Decors */}
-      <div className="absolute top-10 left-10 text-6xl opacity-30 animate-pulse">🦊</div>
+      <img src="/assets/logo/logo-icon.png" alt="" className="absolute top-10 left-10 w-16 h-16 opacity-30 animate-pulse" />
       <div className="absolute bottom-10 right-10 text-6xl opacity-30 animate-bounce">🐊</div>
 
       <div className="bg-white max-w-sm w-full rounded-3xl p-8 border-4 border-orange-100 shadow-xl relative z-10 text-center">
+        <img src="/assets/logo/logo-icon.png" alt="NarraKids" className="w-20 h-20 object-contain mx-auto mb-4" />
         <h1 className="text-3xl font-black text-orange-500 mb-2">Selamat Datang!</h1>
         <p className="text-slate-500 font-bold mb-8">Masuk ke NarraKids</p>
 

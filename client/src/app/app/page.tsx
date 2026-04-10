@@ -135,8 +135,8 @@ export default function AppHome() {
         {/* Header */}
         <header className="flex justify-between items-center mb-10 bg-white p-4 md:px-8 rounded-full shadow-sm border-4 border-sky-100">
           <div className="flex items-center gap-3">
-            <span className="text-3xl">🦊</span>
-            <h1 className="text-2xl font-black text-sky-600 tracking-tight">Beranda NarraKids</h1>
+            <img src="/assets/logo/logo-icon.png" alt="NarraKids" className="w-10 h-10 object-contain" />
+            <img src="/assets/logo/logo-text.png" alt="NarraKids" className="h-7 object-contain hidden sm:block" />
           </div>
           <div className="flex items-center gap-2 hidden sm:flex">
             <button

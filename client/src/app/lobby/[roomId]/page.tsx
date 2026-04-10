@@ -189,7 +189,7 @@ export default function Lobby() {
   return (
     <main className="min-h-screen bg-sky-50 flex flex-col items-center justify-center p-4 md:p-8 font-nunito relative overflow-hidden">
       {/* Background Decors */}
-      <div className="absolute top-10 left-10 text-6xl opacity-20 animate-bounce cursor-default">🦊</div>
+      <img src="/assets/logo/logo-icon.png" alt="" className="absolute top-10 left-10 w-16 h-16 opacity-20 animate-bounce cursor-default" />
       <div className="absolute bottom-20 right-10 text-6xl opacity-20 animate-pulse cursor-default">🐊</div>
       <div className="absolute top-1/4 right-1/4 text-4xl opacity-20 animate-spin-slow cursor-default">⭐</div>
 

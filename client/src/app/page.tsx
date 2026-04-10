@@ -24,8 +24,8 @@ export default function Landing() {
       {/* Header */}
       <header className="p-6 flex justify-between items-center max-w-5xl mx-auto relative z-10 w-full">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-3xl">📖</div>
-          <h1 className="text-3xl font-black text-sky-600 tracking-tight drop-shadow-sm">NarraKids</h1>
+          <img src="/assets/logo/logo-icon.png" alt="NarraKids" className="w-12 h-12 object-contain" />
+          <img src="/assets/logo/logo-text.png" alt="NarraKids" className="h-8 object-contain" />
         </div>
         
         {mounted && !authed && (
@@ -82,7 +82,7 @@ export default function Landing() {
             <p className="font-semibold text-slate-500 text-sm">Masuk kamar yang sama, gambar dan hias buku di waktu yang bersamaan!</p>
           </div>
           <div className="bg-white rounded-3xl p-8 shadow-sm border-2 border-orange-100 transform hover:-translate-y-2 transition-transform">
-            <div className="text-5xl mb-4">🦊</div>
+            <div className="text-5xl mb-4"><img src="/assets/logo/logo-icon.png" alt="Karakter" className="w-16 h-16 object-contain mx-auto" /></div>
             <h3 className="text-xl font-black text-slate-700 mb-2">Banyak Karakter</h3>
             <p className="font-semibold text-slate-500 text-sm">Ada stiker buku, karakter kancil, buaya, dan percakapan interaktif!</p>
           </div>

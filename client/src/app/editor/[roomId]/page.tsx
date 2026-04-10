@@ -1353,7 +1353,7 @@ export default function EditorPage() {
       {/* HEADER */}
       <header className="bg-white px-6 py-4 shadow-[0_4px_0_rgb(224,242,254)] border-b-4 border-sky-200 z-10 flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <span className="text-4xl bg-sky-100 p-2 rounded-full border-2 border-sky-300">🦊</span>
+          <img src="/assets/logo/logo-icon.png" alt="NarraKids" className="w-12 h-12 object-contain bg-sky-100 p-1.5 rounded-full border-2 border-sky-300" />
           <div>
             <h1 className="text-2xl font-black text-sky-600 drop-shadow-sm leading-none">{bookTitle || "Ruang Karya"}</h1>
             <p className="font-bold text-slate-400 text-xs mt-1 uppercase tracking-widest">KODE: {roomId}</p>
