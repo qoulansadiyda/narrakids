@@ -559,6 +559,9 @@ export default function BookViewerPage() {
         
         {/* Book Viewer */}
         <div className="relative shadow-[0_20px_40px_rgba(0,0,0,0.15)] rounded-lg overflow-hidden border-8 border-slate-700/10" style={{ background: "#475569" }}>
+          {/* Garis Tipis Pembatas Halaman (Spine) */}
+          <div className="absolute top-0 bottom-0 left-1/2 w-[2px] -ml-[1px] bg-black/20 z-50 pointer-events-none shadow-[0_0_10px_2px_rgba(0,0,0,0.3)]" />
+          
           {/* @ts-ignore - react-pageflip types */}
           <HTMLFlipBook
             ref={flipBookRef}
