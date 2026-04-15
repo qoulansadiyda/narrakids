@@ -14,7 +14,13 @@ export default function Landing() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-sky-50 overflow-hidden relative font-nunito text-slate-800">
+    <main 
+      className="min-h-screen overflow-hidden relative font-nunito text-slate-800 bg-cover bg-center bg-no-repeat bg-fixed"
+      style={{ backgroundImage: "url('/assets/background/landing-bg.png')" }}
+    >
+      {/* Overlay tipis agar teks tetap terbaca di atas gambar background */}
+      <div className="absolute inset-0 bg-white/40 pointer-events-none z-0" />
+
       {/* Decorative background elements */}
       <div className="absolute top-10 left-10 text-6xl opacity-30 animate-bounce" style={{animationDuration: '3s'}}>☁️</div>
       <div className="absolute top-20 right-20 text-6xl opacity-30 animate-bounce" style={{animationDuration: '4s'}}>☁️</div>
