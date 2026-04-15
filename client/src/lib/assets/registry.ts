@@ -10,9 +10,9 @@ export type AssetItem = {
 
 export const ASSET_REGISTRY: Record<AssetCategory, AssetItem[]> = {
   background: [
-    { id: "bg-tepisungai", name: "Tepi Sungai", src: "/assets/background/bg-tepisungai.png", category: "background" },
-    { id: "bg-hutan", name: "Hutan", src: "/assets/background/bg-hutan.png", category: "background" },
-    { id: "bg-sungai", name: "Sungai", src: "/assets/background/bg-sungai.png", category: "background" },
+    { id: "bg-tepisungai", name: "Tepi Sungai", src: "/assets/background/bg-tepisungai.jpg", category: "background" },
+    { id: "bg-hutan", name: "Hutan", src: "/assets/background/bg-hutan.jpg", category: "background" },
+    { id: "bg-sungai", name: "Sungai", src: "/assets/background/bg-sungai.jpg", category: "background" },
   ],
   character: [
     { id: "ch-kancil", name: "Kancil", src: "/assets/character/ch-kancil.png", category: "character", defaultScale: 0.6 },
