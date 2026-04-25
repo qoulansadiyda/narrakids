@@ -10,8 +10,28 @@ import { attachRealtime } from './realtime.js';
 
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:3000';
 
+const allowedOrigins = [
+  CLIENT_URL,
+  'https://narrakids-client.vercel.app',
+  'http://localhost:3000'
+];
+
 const app = express();
-app.use(cors({ origin: CLIENT_URL, credentials: true }));
+app.use(cors({ 
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.some(url => origin.startsWith(url) || url.includes(origin))) {
+      callback(null, true);
+    } else {
+      // Izinkan koneksi dinamis dari vercel branch apa pun (*.vercel.app)
+      if (origin.endsWith('.vercel.app')) {
+        callback(null, true);
+      } else {
+        callback(null, false);
+      }
+    }
+  }, 
+  credentials: true 
+}));
 app.use(express.json());
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
@@ -27,7 +47,15 @@ app.use('/books', booksRouter);
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: CLIENT_URL,
+    origin: function(origin, callback) {
+      if (!origin || allowedOrigins.some(url => origin.startsWith(url) || url.includes(origin))) {
+        callback(null, true);
+      } else if (origin.endsWith('.vercel.app')) {
+        callback(null, true);
+      } else {
+        callback(null, false);
+      }
+    },
     methods: ['GET','POST'],
     credentials: true,
   }
