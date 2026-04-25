@@ -6,6 +6,7 @@ import type { Socket } from "socket.io-client";
 import { getSocket } from "@/lib/socket";
 import { isAuthed } from "@/lib/auth";
 import type { ReactNode } from "react";
+import { Sparkles, Palette, Eye, ArrowLeft, Radio, Music, Volume2, Trophy, Box, FastForward, BookOpen, Cloud, Hourglass } from "lucide-react";
 
 import { ASSET_REGISTRY } from "@/lib/assets/registry";
 import { addAssetToCanvas } from "@/lib/canvas/addAsset";
@@ -1318,14 +1319,14 @@ export default function EditorPage() {
 
   let turnStatus: ReactNode;
   if (!currentTurnUserId) {
-    turnStatus = <span className="text-sky-400 font-bold animate-pulse">Menyiapkan meja gambar... ✨</span>;
+    turnStatus = <span className="text-sky-400 font-bold animate-pulse flex items-center gap-2">Menyiapkan meja gambar... <Sparkles className="w-5 h-5" /></span>;
   } else if (isMyTurn) {
     turnStatus = (
       <span className="text-emerald-500 font-black flex items-center gap-2">
-        <span>🎨</span> GILIRAN KAMU! 
+        <Palette className="w-5 h-5" /> GILIRAN KAMU! 
         {timeLeft !== null && timeLeft > 0 && (
-          <span className="ml-2 text-rose-600 bg-rose-100 px-3 py-1 rounded-full text-xs font-black border-2 border-rose-200">
-            ⏳ {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, "0")} left
+          <span className="ml-2 inline-flex items-center gap-1 text-rose-600 bg-rose-100 px-3 py-1 rounded-full text-xs font-black border-2 border-rose-200">
+            <Hourglass className="w-3 h-3" /> {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, "0")} left
           </span>
         )}
       </span>
@@ -1335,10 +1336,10 @@ export default function EditorPage() {
       currentTurnUsername ?? (currentTurnUserId ? currentTurnUserId.slice(0, 4) : "other player");
     turnStatus = (
       <span className="text-slate-500 font-bold flex items-center gap-2">
-        <span>👀</span> <span className="hidden sm:inline">Menunggu</span> <span className="text-sky-600 font-black uppercase bg-sky-100 px-2 py-0.5 rounded-md border border-sky-200">{label}</span>
+        <Eye className="w-5 h-5" /> <span className="hidden sm:inline">Menunggu</span> <span className="text-sky-600 font-black uppercase bg-sky-100 px-2 py-0.5 rounded-md border border-sky-200">{label}</span>
         {timeLeft !== null && timeLeft > 0 && (
-          <span className="ml-2 text-amber-500 bg-amber-50 px-3 py-1 rounded-full text-xs font-black border-2 border-amber-200">
-            ⏳ {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, "0")}
+          <span className="ml-2 inline-flex items-center gap-1 text-amber-500 bg-amber-50 px-3 py-1 rounded-full text-xs font-black border-2 border-amber-200">
+            <Hourglass className="w-3 h-3" /> {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, "0")}
           </span>
         )}
       </span>
@@ -1348,7 +1349,7 @@ export default function EditorPage() {
   return (
     <main className="w-full min-h-screen bg-sky-50 font-nunito flex flex-col relative overflow-hidden">
       {/* Decorative BG */}
-      <div className="absolute -top-20 -right-20 text-[10rem] opacity-20 rotate-12 pointer-events-none z-0">☁️</div>
+      <Cloud className="absolute -top-20 -right-20 w-48 h-48 text-white opacity-40 rotate-12 pointer-events-none z-0" />
 
       {/* HEADER */}
       <header className="bg-white px-6 py-4 shadow-[0_4px_0_rgb(224,242,254)] border-b-4 border-sky-200 z-10 flex flex-col md:flex-row items-center justify-between gap-4">
@@ -1356,8 +1357,8 @@ export default function EditorPage() {
           <button onClick={async () => {
             const confirmed = await showConfirm("Yakin mau keluar dari ruang karya? Kamu bisa kehilangan progresmu yang belum disimpan! 😢");
             if (confirmed) router.push("/app");
-          }} className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer" title="Kembali ke Beranda">
-            <span className="text-slate-400 text-xl font-black">←</span>
+          }} className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer text-slate-400 font-black" title="Kembali ke Beranda">
+            <ArrowLeft className="w-6 h-6" />
             <img src="/assets/logo/logo-icon.png" alt="NarraKids" className="w-12 h-12 object-contain bg-sky-100 p-1.5 rounded-full border-2 border-sky-300" />
           </button>
           <div>
@@ -1382,29 +1383,29 @@ export default function EditorPage() {
           {isMyTurn && (
             <div className="bg-white p-4 rounded-3xl border-4 border-slate-100 shadow-[0_8px_0_rgba(241,245,249)]">
               <div className="text-sm font-black mb-3 text-emerald-500 uppercase tracking-widest flex items-center gap-2 border-b-2 border-emerald-50 pb-2">
-                <span>📻</span> Giliranmu
+                <Radio className="w-5 h-5" /> Giliranmu
               </div>
               
               <div className="flex flex-col gap-2">
                 {currentPageBgm ? (
                   <div className="bg-purple-50 border-2 border-purple-200 text-purple-600 px-3 py-2 rounded-2xl flex items-center justify-between text-xs font-bold shadow-sm group">
-                    <span className="truncate flex-1">🎵 {currentPageBgm.name}</span>
+                    <span className="truncate flex-1 inline-flex items-center gap-1"><Music className="w-3 h-3" /> {currentPageBgm.name}</span>
                     <button onClick={() => setCurrentPageBgm(null)} className="ml-1 shrink-0 bg-white text-purple-400 group-hover:bg-purple-400 group-hover:text-white rounded-full w-5 h-5 flex items-center justify-center font-black transition-colors" title="Hapus BGM">✕</button>
                   </div>
                 ) : (
-                  <div className="bg-slate-50 border-2 border-dashed border-slate-200 text-slate-400 px-3 py-2 rounded-2xl text-[10px] font-bold shadow-inner">
-                    🎵 Meneruskan BGM
+                  <div className="bg-slate-50 border-2 border-dashed border-slate-200 text-slate-400 px-3 py-2 rounded-2xl text-[10px] font-bold shadow-inner inline-flex items-center gap-1">
+                    <Music className="w-3 h-3" /> Meneruskan BGM
                   </div>
                 )}
 
                 {currentPageSfx ? (
                   <div className="bg-blue-50 border-2 border-blue-200 text-blue-600 px-3 py-2 rounded-2xl flex items-center justify-between text-xs font-bold shadow-sm group">
-                    <span className="truncate flex-1">🔊 {currentPageSfx.name}</span>
+                    <span className="truncate flex-1 inline-flex items-center gap-1"><Volume2 className="w-3 h-3" /> {currentPageSfx.name}</span>
                     <button onClick={() => setCurrentPageSfx(null)} className="ml-1 shrink-0 bg-white text-blue-400 group-hover:bg-blue-400 group-hover:text-white rounded-full w-5 h-5 flex items-center justify-center font-black transition-colors" title="Hapus SFX">✕</button>
                   </div>
                 ) : (
-                  <div className="bg-slate-50 border-2 border-dashed border-slate-200 text-slate-400 px-3 py-2 rounded-2xl text-[10px] font-bold shadow-inner">
-                    🔊 Tidak Ada Efek Suara
+                  <div className="bg-slate-50 border-2 border-dashed border-slate-200 text-slate-400 px-3 py-2 rounded-2xl text-[10px] font-bold shadow-inner inline-flex items-center gap-1">
+                    <Volume2 className="w-3 h-3" /> Tidak Ada Efek Suara
                   </div>
                 )}
               </div>
@@ -1414,7 +1415,7 @@ export default function EditorPage() {
           {/* LEADERBOARD CARD */}
           <div className="bg-white p-5 rounded-3xl border-4 border-slate-100 shadow-[0_8px_0_rgba(241,245,249)]">
             <div className="text-sm font-black mb-4 text-sky-500 uppercase tracking-widest flex items-center gap-2 border-b-2 border-sky-50 pb-3">
-              <span>🏆</span> Papan Peringkat
+              <Trophy className="w-5 h-5" /> Papan Peringkat
             </div>
             {leaderboard.length === 0 ? (
               <div className="text-slate-400 text-sm text-center italic font-bold my-4 bg-slate-50 py-3 rounded-2xl border-2 border-dashed border-slate-200">Belum ada skor 😢</div>
@@ -1438,7 +1439,7 @@ export default function EditorPage() {
           {/* ASSET LIBRARY CARD */}
           <div className="bg-white p-5 rounded-3xl border-4 border-slate-100 shadow-[0_8px_0_rgba(241,245,249)] flex-1 flex flex-col max-h-[700px]">
             <div className="text-sm font-black mb-4 text-sky-500 uppercase tracking-widest flex items-center gap-2 border-b-2 border-sky-50 pb-3 shrink-0">
-              <span>📦</span> Stiker & Audio
+              <Box className="w-5 h-5" /> Stiker & Audio
             </div>
 
             <div className="flex-1 overflow-hidden" style={{ minHeight: "400px" }}>
@@ -1713,26 +1714,26 @@ export default function EditorPage() {
               <div className="flex-1" />
 
               <button 
-                className={`px-5 py-3 rounded-2xl font-black text-white shadow-[0_4px_0_rgba(0,0,0,0.15)] active:translate-y-1 active:shadow-none transition-all ${isMyTurn ? "bg-rose-400 border-none hover:bg-rose-500 shadow-[0_4px_0_rgb(225,29,72)]" : "bg-slate-300 shadow-none opacity-50 cursor-not-allowed"}`} 
+                className={`group px-5 py-3 rounded-2xl font-black inline-flex items-center justify-center gap-2 text-white shadow-[0_4px_0_rgba(0,0,0,0.15)] active:translate-y-1 active:shadow-none transition-all ${isMyTurn ? "bg-rose-400 border-none hover:bg-rose-500 shadow-[0_4px_0_rgb(225,29,72)]" : "bg-slate-300 shadow-none opacity-50 cursor-not-allowed"}`} 
                 onClick={handleSkip} 
                 disabled={!isMyTurn}
               >
-                ⏩ SKIP (Lewati!)
+                <FastForward className="w-5 h-5" /> SKIP (Lewati!)
               </button>
 
               <button 
-                className={`px-8 py-3 rounded-2xl font-black text-white shadow-[0_4px_0_rgba(0,0,0,0.15)] active:translate-y-1 active:shadow-none transition-all text-lg ${isMyTurn ? "bg-emerald-400 border-none shadow-[0_4px_0_rgb(4,120,87)] hover:bg-emerald-500" : "bg-slate-300 shadow-none opacity-50 cursor-not-allowed"}`} 
+                className={`group px-8 py-3 rounded-2xl font-black inline-flex items-center gap-2 text-white shadow-[0_4px_0_rgba(0,0,0,0.15)] active:translate-y-1 active:shadow-none transition-all text-lg ${isMyTurn ? "bg-emerald-400 border-none shadow-[0_4px_0_rgb(4,120,87)] hover:bg-emerald-500" : "bg-slate-300 shadow-none opacity-50 cursor-not-allowed"}`} 
                 onClick={handleDone} 
                 disabled={!isMyTurn}
               >
-                ✨ SELESAI
+                <Sparkles className="w-6 h-6 group-hover:scale-110 transition-transform" /> SELESAI
               </button>
             </div>
           </div>
 
           <div className="mt-8 bg-white border-4 border-slate-100 rounded-3xl p-6 shadow-sm">
             <div className="text-sm font-black mb-4 text-sky-500 uppercase tracking-widest flex items-center gap-2">
-              <span>📖</span> Sejarah Karya Kalian (Preview)
+              <BookOpen className="w-5 h-5" /> Sejarah Karya Kalian (Preview)
             </div>
 
             {panels.length === 0 && currentTurnNumber === 0 ? (
@@ -1794,7 +1795,7 @@ export default function EditorPage() {
             {viewingHistorySpread && (
               <div className="mt-4 p-4 bg-amber-50 border-2 border-dashed border-amber-300 rounded-2xl flex items-center justify-between shadow-sm">
                 <div className="flex items-center gap-2 text-amber-600 font-bold text-sm">
-                  <span>👀</span> Kamu sedang melihat buku yang sudah jadi.
+                  <Eye className="w-5 h-5" /> Kamu sedang melihat buku yang sudah jadi.
                 </div>
                 <button 
                   onClick={() => {

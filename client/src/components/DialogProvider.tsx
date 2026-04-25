@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useRef, useEffect } from 'react';
+import { Sparkles, Eye, Pencil } from 'lucide-react';
 
 type DialogType = 'alert' | 'confirm' | 'prompt';
 
@@ -82,8 +83,8 @@ export function DialogProvider({ children }: { children: ReactNode }) {
           <div className="bg-white rounded-3xl shadow-2xl overflow-hidden w-full max-w-sm transform animate-in zoom-in-95 duration-200 border-4 border-sky-100">
             {/* Header / Art */}
             <div className={`h-16 flex items-center justify-center ${options.type === 'alert' ? 'bg-orange-400' : options.type === 'confirm' ? 'bg-rose-400' : 'bg-sky-400'}`}>
-               <span className="text-3xl">
-                 {options.type === 'alert' ? '✨' : options.type === 'confirm' ? '👀' : '✏️'}
+               <span className="text-white drop-shadow-sm flex items-center justify-center">
+                 {options.type === 'alert' ? <Sparkles className="w-8 h-8" /> : options.type === 'confirm' ? <Eye className="w-8 h-8" /> : <Pencil className="w-8 h-8" />}
                </span>
             </div>
             

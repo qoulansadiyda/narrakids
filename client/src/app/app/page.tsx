@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { isAuthed, getToken, logout } from '@/lib/auth';
 import { destroySocket } from '@/lib/socket';
 import { useDialog } from '@/components/DialogProvider';
+import { Library, BookOpen, Pencil, Settings, LogOut, Tent, Sparkles, Rocket, ArrowRight, Eye, FolderOpen, Trash2 } from 'lucide-react';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -127,8 +128,8 @@ export default function AppHome() {
   return (
     <main className="min-h-screen bg-sky-50 p-4 md:p-8 font-nunito relative overflow-hidden">
       {/* Background Decors */}
-      <div className="absolute top-20 left-10 text-6xl opacity-20 -rotate-12">📚</div>
-      <div className="absolute bottom-40 right-10 text-6xl opacity-20 rotate-12">✏️</div>
+      <BookOpen className="absolute top-20 left-10 w-16 h-16 text-sky-400 opacity-20 -rotate-12" />
+      <Pencil className="absolute bottom-40 right-10 w-16 h-16 text-sky-400 opacity-20 rotate-12" />
 
       <div className="max-w-4xl mx-auto relative z-10">
         
@@ -140,16 +141,16 @@ export default function AppHome() {
           </div>
           <div className="flex items-center gap-2 hidden sm:flex">
             <button
-              className="font-bold text-indigo-500 hover:text-white bg-indigo-50 hover:bg-indigo-500 px-5 py-2.5 rounded-full transition-colors shadow-sm"
+              className="inline-flex items-center gap-2 font-bold text-indigo-500 hover:text-white bg-indigo-50 hover:bg-indigo-500 px-5 py-2.5 rounded-full transition-colors shadow-sm"
               onClick={() => router.push('/profile')}
             >
-              Pengaturan Akun ⚙️
+              Pengaturan <Settings className="w-4 h-4" />
             </button>
             <button
-              className="font-bold text-rose-500 hover:text-white bg-rose-50 hover:bg-rose-500 px-5 py-2.5 rounded-full transition-colors shadow-sm"
+              className="inline-flex items-center gap-2 font-bold text-rose-500 hover:text-white bg-rose-50 hover:bg-rose-500 px-5 py-2.5 rounded-full transition-colors shadow-sm"
               onClick={handleLogout}
             >
-              Keluar 👋
+              Keluar <LogOut className="w-4 h-4" />
             </button>
           </div>
         </header>
@@ -157,23 +158,23 @@ export default function AppHome() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
           {/* CREATE ROOM CARD */}
           <div className="bg-orange-400 rounded-3xl p-6 text-white shadow-[0_8px_0_rgb(194,65,12)] border-4 border-orange-300">
-            <div className="text-5xl mb-3">🎪</div>
+            <div className="mb-3"><Tent className="w-12 h-12 text-white" /></div>
             <h2 className="text-2xl font-black mb-2">Buat Kamar Bermain</h2>
             <p className="font-semibold text-orange-100 mb-6">
               Bikin ruangan barumu dan ajak teman-teman bergabung untuk membuat cerita!
             </p>
             <button
               type="button"
-              className="w-full bg-white text-orange-600 font-black py-4 rounded-2xl hover:bg-orange-50 active:scale-95 transition-all shadow-sm"
+              className="group w-full inline-flex items-center justify-center gap-2 bg-white text-orange-600 font-black py-4 rounded-2xl hover:bg-orange-50 active:scale-95 transition-all shadow-sm"
               onClick={() => router.push('/lobby/new')}
             >
-              Buat Ruangan Baru! ✨
+              Buat Ruangan Baru! <Sparkles className="w-5 h-5 group-hover:scale-110 transition-transform" />
             </button>
           </div>
 
           {/* JOIN ROOM CARD */}
           <form onSubmit={join} className="bg-emerald-400 rounded-3xl p-6 text-white shadow-[0_8px_0_rgb(4,120,87)] border-4 border-emerald-300">
-            <div className="text-5xl mb-3">🚀</div>
+            <div className="mb-3"><Rocket className="w-12 h-12 text-white" /></div>
             <h2 className="text-2xl font-black mb-2">Ikut Bermain</h2>
             <p className="font-semibold text-emerald-100 mb-6">
               Punya kode ruangan dari temanmu? Yuk masukkan di bawah ini!
@@ -186,10 +187,10 @@ export default function AppHome() {
                 onChange={(e) => setRoomId(e.target.value.trim())}
               />
               <button 
-                className="w-full bg-emerald-600 text-white font-black py-4 rounded-2xl hover:bg-emerald-500 active:scale-95 transition-all shadow-sm" 
+                className="group w-full inline-flex items-center justify-center gap-2 bg-emerald-600 text-white font-black py-4 rounded-2xl hover:bg-emerald-500 active:scale-95 transition-all shadow-sm" 
                 type="submit"
               >
-                Gabung Sekarang! 👉
+                Gabung Sekarang! <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
           </form>
@@ -198,17 +199,17 @@ export default function AppHome() {
         {/* MY BOOKS LIST */}
         <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border-4 border-slate-100">
           <div className="flex items-center gap-3 mb-6">
-            <span className="text-4xl text-sky-400">📚</span>
+            <Library className="w-10 h-10 text-sky-400" />
             <h2 className="text-2xl font-black text-slate-700">Koleksi Bukuku</h2>
           </div>
 
           {loadingBooks ? (
             <div className="flex justify-center items-center h-40">
-              <div className="text-xl font-bold text-sky-400 animate-pulse">Sedang mencari buku... 👀</div>
+              <div className="inline-flex items-center gap-2 text-xl font-bold text-sky-400 animate-pulse">Sedang mencari buku... <Eye className="w-6 h-6" /></div>
             </div>
           ) : books.length === 0 ? (
             <div className="flex flex-col items-center justify-center text-center p-8 bg-slate-50 rounded-2xl border-4 border-dashed border-slate-200">
-              <span className="text-5xl mb-4 opacity-50">📂</span>
+              <FolderOpen className="w-16 h-16 mb-4 text-slate-300" />
               <p className="text-lg font-bold text-slate-500">
                 Belum ada buku nih!<br/>Ayo buat cerita seru dan kumpulkan karyamu di sini.
               </p>
@@ -243,14 +244,14 @@ export default function AppHome() {
                       className="bg-white hover:bg-sky-100 text-sky-500 rounded-full w-10 h-10 flex items-center justify-center shadow-lg border-2 border-sky-300 active:scale-90 transition-transform"
                       title="Ubah Nama"
                     >
-                      ✏️
+                      <Pencil className="w-5 h-5" />
                     </button>
                     <button 
                       onClick={(e) => handleDeleteBook(e, book.id)}
                       className="bg-white hover:bg-rose-100 text-rose-500 rounded-full w-10 h-10 flex items-center justify-center shadow-lg border-2 border-rose-300 active:scale-90 transition-transform"
                       title="Hapus"
                     >
-                      🗑️
+                      <Trash2 className="w-5 h-5" />
                     </button>
                   </div>
                 </div>
@@ -262,16 +263,16 @@ export default function AppHome() {
         {/* Mobile bottom actions */}
         <div className="mt-8 flex flex-col gap-3 text-center sm:hidden">
           <button
-            className="font-bold text-indigo-500 hover:text-white bg-indigo-50 hover:bg-indigo-500 px-6 py-3 rounded-full transition-colors shadow-sm w-full max-w-[200px] mx-auto"
+            className="inline-flex items-center justify-center gap-2 font-bold text-indigo-500 hover:text-white bg-indigo-50 hover:bg-indigo-500 px-6 py-3 rounded-full transition-colors shadow-sm w-full max-w-[200px] mx-auto"
             onClick={() => router.push('/profile')}
           >
-            Pengaturan Akun ⚙️
+            Pengaturan Akun <Settings className="w-4 h-4" />
           </button>
           <button
-            className="font-bold text-rose-500 hover:text-white bg-rose-50 hover:bg-rose-500 px-6 py-3 rounded-full transition-colors shadow-sm w-full max-w-[200px] mx-auto"
+            className="inline-flex items-center justify-center gap-2 font-bold text-rose-500 hover:text-white bg-rose-50 hover:bg-rose-500 px-6 py-3 rounded-full transition-colors shadow-sm w-full max-w-[200px] mx-auto"
             onClick={handleLogout}
           >
-            Keluar 👋
+            Keluar <LogOut className="w-4 h-4" />
           </button>
         </div>
       </div>

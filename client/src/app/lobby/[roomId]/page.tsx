@@ -6,6 +6,7 @@ import type { Socket } from "socket.io-client";
 import { getSocket } from "@/lib/socket";
 import { isAuthed } from "@/lib/auth";
 import { useDialog } from "@/components/DialogProvider";
+import { LoaderCircle, Gamepad2, Sparkles, ArrowLeft, Copy, Crown, Settings, Hourglass, Play } from "lucide-react";
 
 type User = { sid: string; userId: string; username: string };
 type State = {
@@ -163,7 +164,7 @@ export default function Lobby() {
   if (!state) {
     return (
       <main className="min-h-screen bg-sky-50 flex items-center justify-center p-6 font-nunito">
-        <div className="text-2xl font-black text-sky-500 animate-pulse">Menyiapkan Ruangan... 🚀</div>
+        <div className="flex items-center gap-3 text-2xl font-black text-sky-500 animate-pulse">Menyiapkan Ruangan... <LoaderCircle className="w-8 h-8 animate-spin" /></div>
       </main>
     );
   }
@@ -190,15 +191,15 @@ export default function Lobby() {
     <main className="min-h-screen bg-sky-50 flex flex-col items-center justify-center p-4 md:p-8 font-nunito relative overflow-hidden">
       {/* Background Decors */}
       <img src="/assets/logo/logo-icon.png" alt="" className="absolute top-10 left-10 w-16 h-16 opacity-20 animate-bounce cursor-default" />
-      <div className="absolute bottom-20 right-10 text-6xl opacity-20 animate-pulse cursor-default">🐊</div>
-      <div className="absolute top-1/4 right-1/4 text-4xl opacity-20 animate-spin-slow cursor-default">⭐</div>
+      <Gamepad2 className="absolute bottom-20 right-10 w-24 h-24 text-sky-400 opacity-20 animate-pulse cursor-default" />
+      <Sparkles className="absolute top-1/4 right-1/4 w-16 h-16 text-yellow-300 opacity-30 animate-spin-slow cursor-default" />
 
       {/* Back button */}
       <button
         onClick={() => router.replace('/app')}
         className="absolute top-6 left-6 z-20 flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border-2 border-sky-100 text-slate-500 hover:text-sky-500 font-bold transition-colors"
       >
-        ← Kembali
+        <ArrowLeft className="w-5 h-5" /> Kembali
       </button>
 
       <div className="w-full max-w-lg bg-white rounded-[2rem] shadow-xl border-4 border-sky-200 relative z-10 overflow-hidden flex flex-col">
@@ -250,7 +251,7 @@ export default function Lobby() {
                className="px-4 py-3 bg-orange-200 text-orange-600 font-bold hover:bg-orange-300 transition-colors"
                title="Copy Link"
              >
-               📝
+               <Copy className="w-5 h-5" />
              </button>
           </div>
 
@@ -266,10 +267,10 @@ export default function Lobby() {
                   {isHost && u.sid !== me && (
                     <button
                       onClick={() => handleTransferHost(u.sid, u.username)}
-                      className="ml-2 text-[10px] bg-indigo-50 hover:bg-indigo-500 hover:text-white text-indigo-700 border border-indigo-200 font-black px-3 py-1 rounded-full uppercase tracking-wider transition-colors shadow-sm active:translate-y-0.5"
+                      className="ml-2 inline-flex items-center gap-1 text-[10px] bg-indigo-50 hover:bg-indigo-500 hover:text-white text-indigo-700 border border-indigo-200 font-black px-3 py-1 rounded-full uppercase tracking-wider transition-colors shadow-sm active:translate-y-0.5"
                       title="Jadikan Host Permainan"
                     >
-                      👑 Serahkan Host
+                      <Crown className="w-3 h-3" /> Serahkan Host
                     </button>
                   )}
                 </div>
@@ -288,7 +289,7 @@ export default function Lobby() {
           {isHost && (
             <div className="bg-orange-50 p-5 rounded-2xl border-4 border-orange-100 mt-2">
               <h2 className="text-sm font-black text-orange-500 mb-4 uppercase tracking-widest flex items-center gap-2">
-                <span>⚙️</span> Pengaturan Kamar
+                <Settings className="w-5 h-5" /> Pengaturan Kamar
               </h2>
               <div className="space-y-4">
                 <div>
@@ -346,7 +347,7 @@ export default function Lobby() {
           {isHost ? (
             <button
               disabled={!state.canStart}
-              className={`w-full font-black text-xl py-4 rounded-2xl shadow-[0_6px_0_rgb(0,0,0,0.15)] hover:translate-y-1 hover:shadow-[0_4px_0_rgb(0,0,0,0.15)] transition-all ${
+              className={`group w-full flex items-center justify-center gap-2 font-black text-xl py-4 rounded-2xl shadow-[0_6px_0_rgb(0,0,0,0.15)] hover:translate-y-1 hover:shadow-[0_4px_0_rgb(0,0,0,0.15)] transition-all ${
                 state.canStart 
                 ? 'bg-emerald-400 hover:bg-emerald-500 text-white shadow-[0_6px_0_rgb(4,120,87)]' 
                 : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-[0_6px_0_rgb(203,213,225)]'
@@ -360,7 +361,7 @@ export default function Lobby() {
                 });
               }}
             >
-              {state.canStart ? "✨ Mulai Cerita Sekarang!" : "⏳ Menunggu teman lain..."}
+              {state.canStart ? <><Play className="fill-white" /> Mulai Cerita Sekarang!</> : <><Hourglass className="animate-pulse" /> Menunggu teman lain...</>}
             </button>
           ) : (
             <div className="w-full border-4 border-dashed border-sky-200 bg-sky-50 text-sky-600 font-black text-center p-4 rounded-2xl animate-pulse">

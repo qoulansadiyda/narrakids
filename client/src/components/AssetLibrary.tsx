@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import { ASSET_REGISTRY, AssetCategory } from "@/lib/assets/registry";
+import { Image as ImageIcon, Smile, MessageSquare, Sticker, Music, Volume2, Pause, Play, Camera } from "lucide-react";
 
 type Category = AssetCategory;
 
@@ -46,26 +47,26 @@ export default function AssetLibrary({ onPick, onUpload, onPickAudio }: Props) {
     <div className="flex flex-col gap-4 font-nunito h-full">
       {/* Category buttons horizontally scrollable or wrapping */}
       <div className="flex flex-wrap gap-2 text-sm justify-start">
-        <button className={`text-left px-3 py-2 rounded-xl font-black transition-all border-2 flex-grow ${active === "background" ? "bg-amber-100 border-amber-300 text-amber-700 shadow-inner" : "bg-white border-slate-100 text-slate-500 hover:bg-slate-50 hover:border-slate-200 shadow-sm"}`} onClick={() => setActive("background")}>
-          🎑 Latar
+        <button className={`inline-flex items-center gap-1 px-3 py-2 rounded-xl font-black transition-all border-2 flex-grow ${active === "background" ? "bg-amber-100 border-amber-300 text-amber-700 shadow-inner" : "bg-white border-slate-100 text-slate-500 hover:bg-slate-50 hover:border-slate-200 shadow-sm"}`} onClick={() => setActive("background")}>
+          <ImageIcon className="w-4 h-4" /> Latar
         </button>
-        <button className={`text-left px-3 py-2 rounded-xl font-black transition-all border-2 flex-grow ${active === "character" ? "bg-emerald-100 border-emerald-300 text-emerald-700 shadow-inner" : "bg-white border-slate-100 text-slate-500 hover:bg-slate-50 hover:border-slate-200 shadow-sm"}`} onClick={() => setActive("character")}>
-          🧒 Karakter
+        <button className={`inline-flex items-center gap-1 px-3 py-2 rounded-xl font-black transition-all border-2 flex-grow ${active === "character" ? "bg-emerald-100 border-emerald-300 text-emerald-700 shadow-inner" : "bg-white border-slate-100 text-slate-500 hover:bg-slate-50 hover:border-slate-200 shadow-sm"}`} onClick={() => setActive("character")}>
+          <Smile className="w-4 h-4" /> Karakter
         </button>
-        <button className={`text-left px-3 py-2 rounded-xl font-black transition-all border-2 flex-grow ${active === "bubble_text" ? "bg-sky-100 border-sky-300 text-sky-700 shadow-inner" : "bg-white border-slate-100 text-slate-500 hover:bg-slate-50 hover:border-slate-200 shadow-sm"}`} onClick={() => setActive("bubble_text")}>
-          💬 Teks
+        <button className={`inline-flex items-center gap-1 px-3 py-2 rounded-xl font-black transition-all border-2 flex-grow ${active === "bubble_text" ? "bg-sky-100 border-sky-300 text-sky-700 shadow-inner" : "bg-white border-slate-100 text-slate-500 hover:bg-slate-50 hover:border-slate-200 shadow-sm"}`} onClick={() => setActive("bubble_text")}>
+          <MessageSquare className="w-4 h-4" /> Teks
         </button>
-        <button className={`text-left px-3 py-2 rounded-xl font-black transition-all border-2 flex-grow ${active === "property" ? "bg-rose-100 border-rose-300 text-rose-700 shadow-inner" : "bg-white border-slate-100 text-slate-500 hover:bg-slate-50 hover:border-slate-200 shadow-sm"}`} onClick={() => setActive("property")}>
-          🎈 Stiker
+        <button className={`inline-flex items-center gap-1 px-3 py-2 rounded-xl font-black transition-all border-2 flex-grow ${active === "property" ? "bg-rose-100 border-rose-300 text-rose-700 shadow-inner" : "bg-white border-slate-100 text-slate-500 hover:bg-slate-50 hover:border-slate-200 shadow-sm"}`} onClick={() => setActive("property")}>
+          <Sticker className="w-4 h-4" /> Stiker
         </button>
         
         <div className="w-full h-1 bg-slate-100 rounded-full my-1" />
         
-        <button className={`text-left px-3 py-2 rounded-xl font-black transition-all border-2 flex-1 text-center ${active === "bgm" ? "bg-purple-100 border-purple-300 text-purple-700 shadow-inner" : "bg-white border-slate-100 text-slate-500 hover:bg-slate-50 hover:border-slate-200 shadow-sm"}`} onClick={() => setActive("bgm")}>
-          🎵 BGM Musik
+        <button className={`inline-flex items-center justify-center gap-1 px-3 py-2 rounded-xl font-black transition-all border-2 flex-1 ${active === "bgm" ? "bg-purple-100 border-purple-300 text-purple-700 shadow-inner" : "bg-white border-slate-100 text-slate-500 hover:bg-slate-50 hover:border-slate-200 shadow-sm"}`} onClick={() => setActive("bgm")}>
+          <Music className="w-4 h-4" /> BGM Musik
         </button>
-        <button className={`text-left px-3 py-2 rounded-xl font-black transition-all border-2 flex-1 text-center ${active === "sfx" ? "bg-blue-100 border-blue-300 text-blue-700 shadow-inner" : "bg-white border-slate-100 text-slate-500 hover:bg-slate-50 hover:border-slate-200 shadow-sm"}`} onClick={() => setActive("sfx")}>
-          🔊 SFX Efek Suara
+        <button className={`inline-flex items-center justify-center gap-1 px-3 py-2 rounded-xl font-black transition-all border-2 flex-1 ${active === "sfx" ? "bg-blue-100 border-blue-300 text-blue-700 shadow-inner" : "bg-white border-slate-100 text-slate-500 hover:bg-slate-50 hover:border-slate-200 shadow-sm"}`} onClick={() => setActive("sfx")}>
+          <Volume2 className="w-4 h-4" /> SFX Efek Suara
         </button>
       </div>
 
@@ -87,7 +88,7 @@ export default function AssetLibrary({ onPick, onUpload, onPickAudio }: Props) {
                   onClick={() => togglePreview(a.src, a.id)}
                   title="Mainkan Suara"
                 >
-                  {playingId === a.id ? "⏸" : "▶"}
+                  {playingId === a.id ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current ml-0.5" />}
                 </button>
                 <span className="text-xs truncate flex-1 font-bold text-slate-600">{a.name}</span>
                 <button
@@ -137,7 +138,7 @@ export default function AssetLibrary({ onPick, onUpload, onPickAudio }: Props) {
       {onUpload && !isAudioCategory && (
         <div className="mt-2 text-center w-full">
           <label className="flex items-center justify-center w-full py-3 px-4 text-xs tracking-widest bg-orange-400 hover:bg-orange-500 text-white rounded-2xl cursor-pointer transition-all shadow-[0_4px_0_rgb(194,65,12)] active:translate-y-1 active:shadow-none font-black gap-2 uppercase">
-            <span>📷</span> Upload Gambarmu
+            <Camera className="w-5 h-5" /> Upload Gambarmu
             <input
               type="file"
               accept="image/*"

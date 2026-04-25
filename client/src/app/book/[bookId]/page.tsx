@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import HTMLFlipBook from "react-pageflip";
 import { isAuthed, getToken } from "@/lib/auth";
 import { useDialog } from "@/components/DialogProvider";
+import { Sparkles, Star, Cloud, Pencil, Volume2, VolumeX, Download, Trophy, ArrowLeft, BookOpen } from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
@@ -412,12 +413,12 @@ export default function BookViewerPage() {
     return (
       <main className="flex flex-col items-center justify-center min-h-screen bg-sky-100 text-slate-800 px-6 font-nunito relative overflow-hidden">
         {/* Floating Background Effects */}
-        <div className="absolute top-10 left-10 text-6xl opacity-20 -rotate-12 animate-bounce">📚</div>
-        <div className="absolute bottom-20 right-10 text-6xl opacity-20 rotate-12 animate-pulse">✨</div>
-        <div className="absolute top-1/4 right-1/4 text-4xl opacity-20 animate-spin-slow">🌟</div>
-
-        <div className="text-center w-full max-w-lg bg-white/60 p-8 rounded-3xl backdrop-blur-sm border-4 border-white shadow-xl relative z-10">
-          <div className="text-7xl mb-6">📖</div>
+        <div className="absolute top-10 left-10 w-16 h-16 bg-white/30 rounded-full blur-xl"></div>
+        <Sparkles className="absolute bottom-20 right-10 w-16 h-16 text-yellow-300 opacity-40 rotate-12 animate-pulse" />
+        <Star className="absolute top-1/4 right-1/4 w-12 h-12 text-yellow-300 opacity-30 animate-spin-slow" />
+        
+        <div className="bg-white p-8 md:p-12 rounded-[3rem] shadow-2xl relative z-10 text-center border-4 border-sky-100 transform -rotate-2">
+          <BookOpen className="w-16 h-16 mx-auto mb-6 text-sky-400" />
           <h1 className="text-4xl font-black mb-4 text-sky-600 drop-shadow-sm">{book.title}</h1>
           <div className="bg-sky-50 inline-block px-4 py-2 rounded-full border-2 border-sky-200 mb-8">
             <span className="text-slate-500 font-bold uppercase tracking-wider text-xs block mb-1">Karya Hebat Dari:</span>
@@ -447,12 +448,9 @@ export default function BookViewerPage() {
     );
   }
 
-  // We set FlipBook exactly to native Editor size to ensure 1:1 pixel perfection.
-  // The FlipBook will automatically scale down via 'autoSize=true' or 'minWidth/maxWidth' if the window is smaller.
   const pageW = 520;
   const pageH = 390;
 
-  // --- AUDIO LOGIC ---
   const handleToggleBgm = () => {
     setIsBgmPlaying(prev => !prev);
   };
@@ -461,28 +459,20 @@ export default function BookViewerPage() {
     const pageIndex = e.data;
     setCurrentPage(pageIndex);
 
-    // Play Page-Turn SFX
     try {
       if (!pageFlipAudioRef.current) {
         pageFlipAudioRef.current = new Audio("/assets/audio/sfx-page-turn.mp3");
         pageFlipAudioRef.current.volume = 0.5;
       }
       pageFlipAudioRef.current.currentTime = 0;
-      pageFlipAudioRef.current.play().catch(() => {
-        // If local file fails, silently ignore — placeholder may be invalid
-      });
-    } catch {
-      // Ignore
-    }
+      pageFlipAudioRef.current.play().catch(() => {});
+    } catch {}
 
-    // Stop all currently playing page SFX
     activeSfxRef.current.forEach(a => { a.pause(); a.currentTime = 0; });
     activeSfxRef.current = [];
 
-    // Evaluate continuous BGM
     evaluateBgm(pageIndex);
 
-    // Play Page-specific SFX (both left and right pages)
     const leftPageAudio = book.pages[pageIndex]?.audioSrc;
     const rightPageAudio = book.pages[pageIndex + 1]?.audioSrc;
     
@@ -501,16 +491,13 @@ export default function BookViewerPage() {
       activeSfxRef.current.push(sfx);
     }
   };
-  // -------------------
 
-  // --- EXPORT LOGIC ---
   const handleExport = async (type: "png" | "pdf") => {
     setIsExporting(true);
     try {
       if (type === "png") {
         await exportStoryAsPng({ title: book.title, pages: book.pages, showAlert });
       } else {
-        // PDF uses internal mapping w/ native aspect 520x390 for pages
         await exportStoryAsPdf({ title: book.title, pages: book.pages, w: 520, h: 390, showAlert });
       }
     } catch (e) {
@@ -520,7 +507,6 @@ export default function BookViewerPage() {
       setIsExporting(false);
     }
   };
-  // --------------------
 
   const totalPages = book.pages.length;
   let parsedLeaderboard = [];
@@ -534,16 +520,16 @@ export default function BookViewerPage() {
 
   return (
     <main className="min-h-screen bg-sky-200 text-slate-800 flex flex-col items-center py-6 px-4 font-nunito relative overflow-hidden">
-      {/* Immersive Background Clouds */}
-      <div className="absolute top-0 left-0 w-full h-[300px] bg-sky-100 rounded-b-[100px] -z-10 shadow-sm pointer-events-none opacity-80" />
-      <div className="absolute top-20 left-10 text-white opacity-40 text-8xl pointer-events-none">☁️</div>
-      <div className="absolute top-10 right-20 text-white opacity-40 text-6xl pointer-events-none">☁️</div>
+      {/* Dynamic Background Elements */}
+      <Cloud className="absolute top-20 left-10 text-white opacity-40 w-32 h-32 pointer-events-none" />
+      <Cloud className="absolute top-10 right-20 text-white opacity-40 w-24 h-24 pointer-events-none" />
+      <div className="absolute bottom-0 w-full h-[50vh] bg-gradient-to-t from-sky-400/20 to-transparent pointer-events-none"></div>
 
       {/* Header Info */}
-      <div className="mb-6 text-center select-none z-10 relative mt-4">
+      <div className="mb-6 text-center z-10 relative mt-4">
         <h1 className="text-3xl font-black mb-2 text-sky-800 drop-shadow-sm px-4 py-1 bg-white/50 rounded-full inline-block backdrop-blur-sm border-2 border-white">{book.title}</h1>
-        <p className="text-slate-600 font-bold bg-white/80 px-4 py-2 rounded-full text-sm inline-block shadow-sm">
-          🌟 Karya: {(() => {
+        <p className="inline-flex items-center gap-1 font-bold text-sky-100 bg-sky-600/50 px-6 py-2 rounded-full text-sm sm:text-base border border-sky-400 shadow-inner">
+          <Star className="w-5 h-5 text-yellow-300 fill-yellow-300" /> Karya: {(() => {
             try {
               const lb = book.leaderboard ? JSON.parse(book.leaderboard) : [];
               if (lb.length > 0) return lb.map((p: any) => p.username || 'Anonim').join(', ');
@@ -554,8 +540,8 @@ export default function BookViewerPage() {
       </div>
 
       {/* The Magic Desk Setting */}
-      <div className="relative p-6 pt-8 pb-10 bg-orange-100/50 backdrop-blur-md rounded-[3rem] shadow-2xl border-4 border-white/60 mx-auto z-10">
-        <div className="absolute -top-6 -left-6 text-6xl rotate-12 opacity-80 z-20 pointer-events-none">✏️</div>
+      <div className="relative mt-8 group select-none flex justify-center perspective-[2000px]">
+        <Pencil className="absolute -top-6 -left-6 w-16 h-16 rotate-12 text-sky-300 opacity-80 z-20 pointer-events-none" />
         
         {/* Book Viewer */}
         <div className="relative shadow-[0_20px_40px_rgba(0,0,0,0.15)] rounded-lg overflow-hidden border-8 border-slate-700/10" style={{ background: "#475569" }}>
@@ -654,30 +640,30 @@ export default function BookViewerPage() {
             : "bg-slate-100 border-slate-200 text-slate-500 hover:bg-slate-200 shadow-[0_4px_0_rgb(226,232,240)]"
           }`}
         >
-          {isBgmPlaying ? "🔊 Matikan Musik" : "🔈 Nyalakan Musik"}
+          {isBgmPlaying ? <><VolumeX className="w-5 h-5" /> Matikan Musik</> : <><Volume2 className="w-5 h-5" /> Nyalakan Musik</>}
         </button>
 
         <button
           disabled={isExporting}
           onClick={() => handleExport("pdf")}
-          className="px-5 py-3 rounded-2xl bg-orange-400 text-white font-black shadow-[0_4px_0_rgb(194,65,12)] hover:bg-orange-500 transition-all border-none active:translate-y-1 active:shadow-none disabled:opacity-50"
+          className="group inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-orange-400 text-white font-black shadow-[0_4px_0_rgb(194,65,12)] hover:bg-orange-500 transition-all border-none active:translate-y-1 active:shadow-none disabled:opacity-50"
         >
-          {isExporting ? "Memproses..." : "⬇️ Download PDF"}
+          <Download className="w-5 h-5 group-hover:-translate-y-1 transition-transform" /> {isExporting ? "Memproses..." : "Download PDF"}
         </button>
         <button
           disabled={isExporting}
           onClick={() => handleExport("png")}
-          className="px-5 py-3 rounded-2xl bg-emerald-400 text-white font-black shadow-[0_4px_0_rgb(4,120,87)] hover:bg-emerald-500 transition-all border-none active:translate-y-1 active:shadow-none disabled:opacity-50"
+          className="group inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-emerald-400 text-white font-black shadow-[0_4px_0_rgb(4,120,87)] hover:bg-emerald-500 transition-all border-none active:translate-y-1 active:shadow-none disabled:opacity-50"
         >
-          {isExporting ? "Memproses..." : "⬇️ Download PNG"}
+          <Download className="w-5 h-5 group-hover:-translate-y-1 transition-transform" /> {isExporting ? "Memproses..." : "Download PNG"}
         </button>
       </div>
 
       {/* Leaderboard Section */}
       {parsedLeaderboard && parsedLeaderboard.length > 0 && (
         <div className="mt-12 w-full max-w-sm bg-white rounded-[2rem] p-6 sm:p-8 border-4 border-sky-100 shadow-xl z-10">
-          <h2 className="text-xl sm:text-2xl font-black mb-6 text-center text-sky-500 drop-shadow-sm border-b-2 border-sky-50 pb-4">
-            🏆 Bintang Kelas NarraKids
+          <h2 className="text-xl sm:text-2xl font-black mb-6 flex items-center justify-center gap-2 text-sky-500 drop-shadow-sm border-b-2 border-sky-50 pb-4">
+            <Trophy className="w-6 h-6" /> Bintang Kelas NarraKids
           </h2>
           <div className="space-y-4">
             {parsedLeaderboard.map((player: any, idx: number) => (
@@ -689,7 +675,7 @@ export default function BookViewerPage() {
                   <span className="font-bold text-slate-700 text-sm sm:text-base">{player.username || player.sid.slice(0, 4)}</span>
                 </div>
                 <div className="flex items-center gap-2 bg-yellow-100 px-3 py-1 rounded-full border border-yellow-200">
-                  <span className="text-lg">⭐</span>
+                  <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                   <span className="font-mono text-sm sm:text-base text-yellow-600 font-black">{player.total}</span>
                 </div>
               </div>
@@ -700,7 +686,7 @@ export default function BookViewerPage() {
 
       {/* Back button */}
       <button
-        className="mt-12 mb-8 text-sky-600 font-bold hover:text-sky-800 transition-colors underline decoration-wavy decoration-sky-300 z-10"
+        className="mt-12 mb-8 inline-flex items-center gap-2 text-sky-600 font-bold hover:text-sky-800 transition-colors underline decoration-wavy decoration-sky-300 z-10 text-lg"
         onClick={() => {
           if (bgmAudioRef.current) { bgmAudioRef.current.pause(); bgmAudioRef.current = null; }
           if (pageFlipAudioRef.current) { pageFlipAudioRef.current.pause(); pageFlipAudioRef.current = null; }
@@ -709,7 +695,7 @@ export default function BookViewerPage() {
           router.push("/app");
         }}
       >
-        ← Kembali ke Halaman Utama
+        <ArrowLeft className="w-5 h-5" /> Kembali ke Halaman Utama
       </button>
     </main>
   );

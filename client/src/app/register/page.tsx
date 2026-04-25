@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { postJSON } from '@/lib/api';
 import { useDialog } from '@/components/DialogProvider';
+import { Sparkles, Smile, ArrowLeft, Eye, EyeOff, LoaderCircle, UserPlus } from 'lucide-react';
 
 export default function RegisterPage() {
   const [username, setU] = useState('');
@@ -33,15 +34,15 @@ export default function RegisterPage() {
   return (
     <main className="min-h-screen bg-sky-50 flex items-center justify-center p-6 font-nunito relative overflow-hidden">
       {/* Decors */}
-      <div className="absolute top-10 right-10 text-6xl opacity-30 animate-pulse">🌟</div>
-      <div className="absolute bottom-10 left-10 text-6xl opacity-30 animate-bounce">🦌</div>
+      <Sparkles className="absolute top-10 right-10 w-20 h-20 text-yellow-400 opacity-40 animate-pulse" />
+      <Smile className="absolute bottom-10 left-10 w-24 h-24 text-sky-400 opacity-30 animate-bounce" style={{animationDuration: '3s'}} />
 
       {/* Back button */}
       <button
         onClick={() => router.push('/')}
         className="absolute top-6 left-6 z-20 flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border-2 border-sky-100 text-slate-500 hover:text-sky-500 font-bold transition-colors"
       >
-        ← Kembali
+        <ArrowLeft className="w-5 h-5" /> Kembali
       </button>
       
       <div className="bg-white max-w-sm w-full rounded-3xl p-8 border-4 border-sky-100 shadow-xl relative z-10 text-center">
@@ -66,11 +67,11 @@ export default function RegisterPage() {
             />
             <button
               type="button"
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-xl opacity-60 hover:opacity-100 transition-opacity focus:outline-none"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-sky-500 transition-colors focus:outline-none"
               onClick={() => setShowPassword(!showPassword)}
               title={showPassword ? "Sembunyikan Sandi" : "Lihat Sandi"}
             >
-              {showPassword ? "🙈" : "👁️"}
+              {showPassword ? <EyeOff className="w-6 h-6" /> : <Eye className="w-6 h-6" />}
             </button>
           </div>
           <p className="text-xs text-slate-500 font-semibold px-2 -mt-2">
@@ -79,9 +80,13 @@ export default function RegisterPage() {
           
           <button 
             disabled={loading}
-            className="bg-sky-500 hover:bg-sky-400 text-white font-black text-xl py-4 rounded-2xl shadow-[0_6px_0_rgb(2,132,199)] hover:shadow-[0_4px_0_rgb(2,132,199)] hover:translate-y-1 transition-all mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="group inline-flex items-center justify-center gap-2 bg-sky-500 hover:bg-sky-400 text-white font-black text-xl py-4 rounded-2xl shadow-[0_6px_0_rgb(2,132,199)] hover:shadow-[0_4px_0_rgb(2,132,199)] hover:translate-y-1 transition-all mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Tunggu Sebentar... 🚀' : 'Daftar! 🌟'}
+            {loading ? (
+              <><LoaderCircle className="w-6 h-6 animate-spin" /> Tunggu Sebentar...</>
+            ) : (
+              <>Daftar! <UserPlus className="w-6 h-6 group-hover:scale-110 transition-transform" /></>
+            )}
           </button>
         </form>
         

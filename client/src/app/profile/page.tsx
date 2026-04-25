@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { isAuthed, getToken, logout } from '@/lib/auth';
 import { useDialog } from '@/components/DialogProvider';
+import { Settings, Palette, ArrowLeft, User, KeyRound, AlertTriangle, Trash2, Eye, EyeOff, Sparkles, ShieldCheck, LoaderCircle } from 'lucide-react';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -132,8 +133,8 @@ export default function ProfilePage() {
   return (
     <main className="min-h-screen bg-sky-50 p-4 md:p-8 font-nunito relative overflow-hidden">
       {/* Background Decors */}
-      <div className="absolute top-20 right-10 text-6xl opacity-20 rotate-12 flex">⚙️</div>
-      <div className="absolute bottom-20 left-10 text-6xl opacity-20 -rotate-12 flex">🎨</div>
+      <Settings className="absolute top-20 right-10 w-24 h-24 text-sky-300 opacity-20 rotate-12" />
+      <Palette className="absolute bottom-20 left-10 w-24 h-24 text-emerald-300 opacity-20 -rotate-12" />
 
       <div className="max-w-2xl mx-auto relative z-10">
         
@@ -141,9 +142,9 @@ export default function ProfilePage() {
         <header className="flex items-center gap-4 mb-8">
           <button 
             onClick={() => router.push('/app')}
-            className="w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-sm text-sky-500 hover:bg-sky-100 hover:scale-105 active:scale-95 transition-all text-xl font-bold border-4 border-sky-100"
+            className="w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-sm text-sky-500 hover:bg-sky-100 hover:scale-105 active:scale-95 transition-all outline-none border-4 border-sky-100 focus:ring-4 ring-sky-200"
           >
-            ←
+            <ArrowLeft className="w-6 h-6" />
           </button>
           <h1 className="text-3xl font-black text-slate-700">Pengaturan Akun</h1>
         </header>
@@ -152,7 +153,7 @@ export default function ProfilePage() {
           {/* UBAH USERNAME CARD */}
           <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border-4 border-sky-100">
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-3xl">👤</span>
+              <User className="w-8 h-8 text-sky-500" />
               <h2 className="text-xl font-black text-sky-600">Ganti Nama Identitas</h2>
             </div>
             <p className="text-slate-500 font-semibold mb-6">Bosan dengan namamu sekarang? Ganti jadi yang lebih keren!</p>
@@ -166,10 +167,14 @@ export default function ProfilePage() {
               />
               <button 
                 disabled={loadingName || newUsername.trim() === username || newUsername.trim() === ''}
-                className="w-full bg-sky-500 text-white font-black py-4 rounded-2xl hover:bg-sky-400 active:scale-95 transition-all shadow-[0_6px_0_rgb(2,132,199)] hover:shadow-[0_4px_0_rgb(2,132,199)] hover:translate-y-1 mb-2 disabled:opacity-50 disabled:cursor-not-allowed" 
+                className="group w-full inline-flex items-center justify-center gap-2 bg-sky-500 text-white font-black py-4 rounded-2xl hover:bg-sky-400 active:scale-95 transition-all shadow-[0_6px_0_rgb(2,132,199)] hover:shadow-[0_4px_0_rgb(2,132,199)] hover:translate-y-1 mb-2 disabled:opacity-50 disabled:cursor-not-allowed" 
                 type="submit"
               >
-                {loadingName ? 'Menyimpan... ⏳' : 'Simpan Nama Baru! ✨'}
+                {loadingName ? (
+                  <><LoaderCircle className="w-5 h-5 animate-spin" /> Menyimpan...</>
+                ) : (
+                  <>Simpan Nama Baru! <Sparkles className="w-5 h-5 group-hover:scale-110 transition-transform" /></>
+                )}
               </button>
             </form>
           </div>
@@ -177,7 +182,7 @@ export default function ProfilePage() {
           {/* UBAH PASSWORD CARD */}
           <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border-4 border-emerald-100">
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-3xl">🗝️</span>
+              <KeyRound className="w-8 h-8 text-emerald-500" />
               <h2 className="text-xl font-black text-emerald-600">Ubah Kata Sandi</h2>
             </div>
             <p className="text-slate-500 font-semibold mb-6">Pastikan hanya kamu yang tahu kata sandi rahasiamu!</p>
@@ -222,10 +227,14 @@ export default function ProfilePage() {
               </p>
               <button 
                 disabled={loadingPass || !oldPassword || !newPassword}
-                className="w-full bg-emerald-500 text-white font-black py-4 rounded-2xl hover:bg-emerald-400 active:scale-95 transition-all shadow-[0_6px_0_rgb(5,150,105)] hover:shadow-[0_4px_0_rgb(5,150,105)] hover:translate-y-1 mb-2 disabled:opacity-50 disabled:cursor-not-allowed" 
+                className="group w-full inline-flex items-center justify-center gap-2 bg-emerald-500 text-white font-black py-4 rounded-2xl hover:bg-emerald-400 active:scale-95 transition-all shadow-[0_6px_0_rgb(5,150,105)] hover:shadow-[0_4px_0_rgb(5,150,105)] hover:translate-y-1 mb-2 disabled:opacity-50 disabled:cursor-not-allowed" 
                 type="submit"
               >
-                {loadingPass ? 'Menyimpan... ⏳' : 'Simpan Sandi Baru! 🛡️'}
+                {loadingPass ? (
+                  <><LoaderCircle className="w-5 h-5 animate-spin" /> Menyimpan...</>
+                ) : (
+                  <>Simpan Sandi Baru! <ShieldCheck className="w-5 h-5 group-hover:scale-110 transition-transform" /></>
+                )}
               </button>
             </form>
           </div>
@@ -233,7 +242,7 @@ export default function ProfilePage() {
           {/* HAPUS AKUN CARD (DANGER ZONE) */}
           <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border-4 border-rose-100 mt-4">
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-3xl">⚠️</span>
+              <AlertTriangle className="w-8 h-8 text-rose-500" />
               <h2 className="text-xl font-black text-rose-600">Hapus Akun</h2>
             </div>
             <p className="text-rose-500 font-semibold mb-6">
@@ -241,10 +250,10 @@ export default function ProfilePage() {
             </p>
             <button 
               onClick={handleDeleteAccount}
-              className="w-full bg-rose-100 text-rose-600 border-2 border-rose-200 font-black py-4 rounded-2xl hover:bg-rose-500 hover:text-white hover:border-rose-500 active:scale-95 transition-all shadow-sm" 
+              className="group w-full inline-flex items-center justify-center gap-2 bg-rose-100 text-rose-600 border-2 border-rose-200 font-black py-4 rounded-2xl hover:bg-rose-500 hover:text-white hover:border-rose-500 active:scale-95 transition-all shadow-sm" 
               type="button"
             >
-              Hapus Akunku Selamanya 🗑️
+              Hapus Akunku Selamanya <Trash2 className="w-5 h-5 group-hover:-translate-y-1 transition-transform" />
             </button>
           </div>
 
