@@ -312,10 +312,15 @@ export default function Lobby() {
                   <input
                     type="number"
                     min={1}
-                    max={100}
+                    max={10}
                     className="w-full bg-white border-2 border-orange-200 text-orange-800 font-bold rounded-xl px-3 py-3 outline-none focus:border-orange-400 transition-colors"
                     value={canvasQuota}
-                    onChange={(e) => setCanvasQuota(Math.max(1, parseInt(e.target.value) || 1))}
+                    onChange={(e) => {
+                      let val = parseInt(e.target.value) || 1;
+                      if (val > 10) val = 10;
+                      if (val < 1) val = 1;
+                      setCanvasQuota(val);
+                    }}
                   />
                   <p className="text-xs text-orange-600/70 mt-1 font-semibold">
                     *Masing-masing akan bikin {canvasQuota} panel.
