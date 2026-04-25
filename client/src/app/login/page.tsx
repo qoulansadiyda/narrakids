@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { postJSON } from '@/lib/api';
 import { useDialog } from '@/components/DialogProvider';
 import { Gamepad2, Eye, EyeOff, LogIn, LoaderCircle, ArrowLeft } from 'lucide-react';
+import { destroySocket } from '@/lib/socket';
 
 export default function LoginPage() {
   const [username, setU] = useState('');
@@ -23,6 +24,7 @@ export default function LoginPage() {
     try {
       const data = await postJSON<{ token: string }>('/auth/login', { username, password });
       localStorage.setItem('token', data.token);
+      destroySocket();
       router.push('/app');
     } catch (e: any) {
       let errMsg = e.message;

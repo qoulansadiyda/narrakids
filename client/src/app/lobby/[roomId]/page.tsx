@@ -72,6 +72,7 @@ export default function Lobby() {
     socket.on("room:kicked", onKicked);
 
     const doJoin = () => {
+      if (!isAuthed()) return;
       if (roomId === "new") {
         socket.emit("room:create", { min: 2 }, (resp: any) => {
           if (!resp?.roomId) return;
