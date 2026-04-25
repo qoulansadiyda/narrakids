@@ -7,6 +7,7 @@ import { useDialog } from '@/components/DialogProvider';
 export default function RegisterPage() {
   const [username, setU] = useState('');
   const [password, setP] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { showAlert } = useDialog();
@@ -55,13 +56,26 @@ export default function RegisterPage() {
             value={username}
             onChange={e => setU(e.target.value)}
           />
-          <input
-            className="border-2 border-slate-200 focus:border-sky-400 outline-none p-4 rounded-2xl font-bold text-slate-700 transition-colors"
-            placeholder="Kata Sandi Rahasia (≥6)"
-            type="password"
-            value={password}
-            onChange={e => setP(e.target.value)}
-          />
+          <div className="relative">
+            <input
+              className="w-full border-2 border-slate-200 focus:border-sky-400 outline-none p-4 pr-14 rounded-2xl font-bold text-slate-700 transition-colors"
+              placeholder="Kata Sandi Rahasia"
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={e => setP(e.target.value)}
+            />
+            <button
+              type="button"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-xl opacity-60 hover:opacity-100 transition-opacity focus:outline-none"
+              onClick={() => setShowPassword(!showPassword)}
+              title={showPassword ? "Sembunyikan Sandi" : "Lihat Sandi"}
+            >
+              {showPassword ? "🙈" : "👁️"}
+            </button>
+          </div>
+          <p className="text-xs text-slate-500 font-semibold px-2 -mt-2">
+            *Kata sandi minimal 6 karakter. Boleh pakai spasi, huruf, atau angka!
+          </p>
           
           <button 
             disabled={loading}

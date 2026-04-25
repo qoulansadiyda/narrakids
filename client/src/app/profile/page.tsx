@@ -15,6 +15,8 @@ export default function ProfilePage() {
   const [newUsername, setNewUsername] = useState('');
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
   const [loadingName, setLoadingName] = useState(false);
   const [loadingPass, setLoadingPass] = useState(false);
@@ -181,20 +183,43 @@ export default function ProfilePage() {
             <p className="text-slate-500 font-semibold mb-6">Pastikan hanya kamu yang tahu kata sandi rahasiamu!</p>
             
             <form onSubmit={handleUpdatePassword} className="flex flex-col gap-4">
-              <input
-                type="password"
-                className="w-full bg-emerald-50 text-slate-700 font-bold px-4 py-4 rounded-2xl outline-none border-2 border-transparent focus:border-emerald-300 transition-colors"
-                placeholder="Ketik Kata Sandi Lamamu"
-                value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
-              />
-              <input
-                type="password"
-                className="w-full bg-emerald-50 text-slate-700 font-bold px-4 py-4 rounded-2xl outline-none border-2 border-transparent focus:border-emerald-300 transition-colors"
-                placeholder="Kata Sandi Rahasia yang Baru"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-              />
+              <div className="relative">
+                <input
+                  type={showOldPassword ? "text" : "password"}
+                  className="w-full bg-emerald-50 text-slate-700 font-bold px-4 py-4 pr-14 rounded-2xl outline-none border-2 border-transparent focus:border-emerald-300 transition-colors"
+                  placeholder="Ketik Kata Sandi Lamamu"
+                  value={oldPassword}
+                  onChange={(e) => setOldPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-xl opacity-60 hover:opacity-100 transition-opacity focus:outline-none"
+                  onClick={() => setShowOldPassword(!showOldPassword)}
+                  title={showOldPassword ? "Sembunyikan Sandi" : "Lihat Sandi"}
+                >
+                  {showOldPassword ? "🙈" : "👁️"}
+                </button>
+              </div>
+              <div className="relative">
+                <input
+                  type={showNewPassword ? "text" : "password"}
+                  className="w-full bg-emerald-50 text-slate-700 font-bold px-4 py-4 pr-14 rounded-2xl outline-none border-2 border-transparent focus:border-emerald-300 transition-colors"
+                  placeholder="Kata Sandi Rahasia yang Baru"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-xl opacity-60 hover:opacity-100 transition-opacity focus:outline-none"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  title={showNewPassword ? "Sembunyikan Sandi" : "Lihat Sandi"}
+                >
+                  {showNewPassword ? "🙈" : "👁️"}
+                </button>
+              </div>
+              <p className="text-xs text-slate-500 font-semibold px-2 -mt-2">
+                *Kata sandi baru minimal 6 karakter.
+              </p>
               <button 
                 disabled={loadingPass || !oldPassword || !newPassword}
                 className="w-full bg-emerald-500 text-white font-black py-4 rounded-2xl hover:bg-emerald-400 active:scale-95 transition-all shadow-[0_6px_0_rgb(5,150,105)] hover:shadow-[0_4px_0_rgb(5,150,105)] hover:translate-y-1 mb-2 disabled:opacity-50 disabled:cursor-not-allowed" 
