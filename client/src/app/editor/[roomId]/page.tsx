@@ -154,9 +154,16 @@ export default function EditorPage() {
   const [pageSize, setPageSize] = useState<{ w: number; h: number }>({ w: 520, h: 390 });
   const [canvasScale, setCanvasScale] = useState<number>(1);
 
-  // ── Auth gate ──
+  // ── Auth gate & Refresh Warning ──
   useEffect(() => {
     if (!isAuthed()) router.replace("/login");
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "Yakin mau memuat ulang halaman? Kamu mungkin akan butuh waktu sejenak untuk kembali terhubung dengan teman-temanmu!";
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [router]);
 
   const [mySocketId, setMySocketId] = useState<string | null>(null);
@@ -735,14 +742,8 @@ export default function EditorPage() {
       setMySocketId(s.id ?? null);
       console.log("[CLIENT] editor connected with id", s.id);
       
-      const authStr = localStorage.getItem("narrakids_auth");
-      if (!authStr) return;
-      
-      let authObj;
-      try { authObj = JSON.parse(authStr); } catch (e) { return; }
-
       // Sangat krusial jika user reconnect via Long-Polling atau Vercel drop socket
-      s.emit("room:join", { roomId, userId: authObj.id, username: authObj.username }, async (resp: any) => {
+      s.emit("room:join", { roomId }, async (resp: any) => {
         if (!resp?.ok && resp?.error === "ROOM_NOT_FOUND") {
           await showAlert("Permainan di ruangan ini sudah ditutup!");
           router.replace("/app");
