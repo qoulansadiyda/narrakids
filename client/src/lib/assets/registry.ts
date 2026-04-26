@@ -35,7 +35,11 @@ export const ASSET_REGISTRY: Record<AssetCategory, AssetItem[]> = {
   ],
   property: [
     { id: "pr-batu", name: "Batu", src: "/assets/property/pr-batu.png", category: "property", defaultScale: 0.7 },
-    { id: "pr-pohon", name: "Pohon", src: "/assets/property/pr-pohon.png", category: "property", defaultScale: 0.7 },
+    { id: "pr-pohon kecil", name: "Pohon", src: "/assets/property/pr-pohon kecil.png", category: "property", defaultScale: 0.7 },
+    { id: "pr-pohon besar", name: "Pohon Besar", src: "/assets/property/pr-pohon besar.png", category: "property", defaultScale: 0.7 },
+    { id: "pr-air", name: "Air", src: "/assets/property/pr-air.png", category: "property", defaultScale: 0.7 },
+    { id: "pr-awan", name: "Awan", src: "/assets/property/pr-awan.png", category: "property", defaultScale: 0.7 },
+    { id: "pr-semak", name: "Semak", src: "/assets/property/pr-semak.png", category: "property", defaultScale: 0.7 },
   ],
   bubble_text: [
     { id: "bb-textonly", name: "Text Only", src: "", category: "bubble_text", defaultScale: 1 },
