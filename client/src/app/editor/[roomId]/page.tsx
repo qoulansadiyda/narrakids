@@ -764,7 +764,7 @@ export default function EditorPage() {
     };
 
     if (s.connected) handleConnect();
-    else s.on("connect", handleConnect);
+    s.on("connect", handleConnect);
     
     s.on("room:kicked", handleKicked);
 
@@ -932,6 +932,7 @@ export default function EditorPage() {
       s.off("canvas:transform", handleRemoteTransform);
       s.off("turn:timer", handleTimer);
       s.off("room:finished", handleRoomFinished);
+      s.off("connect", handleConnect);
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, [socket, roomId]);

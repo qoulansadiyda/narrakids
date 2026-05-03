@@ -78,6 +78,7 @@ export default function Lobby() {
           if (!resp?.roomId) return;
           if (!navigatedRef.current) {
             navigatedRef.current = true;
+            stayInRoomRef.current = true; // Jangan kirim leave saat redirect ke real roomId
             if (resp?.snapshot) setState(resp.snapshot);
             if (resp?.you) setMe(resp.you);
             router.replace(`/lobby/${resp.roomId}`);
@@ -123,14 +124,9 @@ export default function Lobby() {
       }
     };
 
+    // Jalankan doJoin setiap kali koneksi socket (kembali) tersambung
     if (socket.connected) doJoin();
-    else {
-      const once = () => {
-        doJoin();
-        socket.off("connect", once);
-      };
-      socket.on("connect", once);
-    }
+    socket.on("connect", doJoin);
 
     return () => {
       // bersihkan listener + info server bahwa kita keluar
@@ -141,6 +137,7 @@ export default function Lobby() {
       socket.off("room:joined", onJoined);
       socket.off("room:start", onStart);
       socket.off("room:kicked", onKicked);
+      socket.off("connect", doJoin);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId]);

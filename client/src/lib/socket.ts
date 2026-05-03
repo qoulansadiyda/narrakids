@@ -41,6 +41,13 @@ export function getSocket(): Socket {
       console.warn("[CLIENT] connect_error", e.message)
     );
     s.on("disconnect", (r) => console.warn("[CLIENT] disconnect", r));
+    s.on("auth:error", (data) => {
+      console.error("[CLIENT] auth:error", data);
+      localStorage.removeItem("token");
+      if (typeof window !== "undefined") {
+        window.location.href = "/login";
+      }
+    });
   }
   return socket!;
 }
