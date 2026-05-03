@@ -1444,7 +1444,7 @@ export default function EditorPage() {
               <Box className="w-5 h-5" /> Stiker & Audio
             </div>
 
-            <div className="flex-1 overflow-hidden" style={{ minHeight: "400px" }}>
+            <div className="flex-1 flex flex-col overflow-hidden min-h-[400px]">
               <AssetLibrary
                 onPick={async (category, index) => {
                   if (viewingHistorySpread) { await showAlert("Ngintip buku dulu ya! Tutup layarnya di area bawah untuk nambahin karakter! 👀"); return; }

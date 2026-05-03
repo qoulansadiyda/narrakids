@@ -71,7 +71,7 @@ export default function AssetLibrary({ onPick, onUpload, onPickAudio }: Props) {
       </div>
 
       {/* Grid thumbnails / Audio list */}
-      <div className="border-4 border-slate-100 bg-slate-50 rounded-2xl p-3 flex-1 overflow-y-auto">
+      <div className="border-4 border-slate-100 bg-slate-50 rounded-2xl p-3 flex-1 overflow-y-auto touch-pan-y overscroll-contain custom-scrollbar">
         <div className="text-xs text-slate-300 mb-2 capitalize">
           {active} assets ({items.length})
         </div>
