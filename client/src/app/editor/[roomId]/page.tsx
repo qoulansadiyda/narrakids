@@ -1439,7 +1439,7 @@ export default function EditorPage() {
           </div>
 
           {/* ASSET LIBRARY CARD */}
-          <div className="bg-white p-5 rounded-3xl border-4 border-slate-100 shadow-[0_8px_0_rgba(241,245,249)] flex-1 flex flex-col max-h-[700px]">
+          <div className="bg-white p-5 rounded-3xl border-4 border-slate-100 shadow-[0_8px_0_rgba(241,245,249)] h-[500px] xl:h-auto xl:flex-1 flex flex-col xl:max-h-[700px]">
             <div className="text-sm font-black mb-4 text-sky-500 uppercase tracking-widest flex items-center gap-2 border-b-2 border-sky-50 pb-3 shrink-0">
               <Box className="w-5 h-5" /> Stiker & Audio
             </div>

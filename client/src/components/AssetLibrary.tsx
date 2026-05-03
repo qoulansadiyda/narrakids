@@ -44,7 +44,7 @@ export default function AssetLibrary({ onPick, onUpload, onPickAudio }: Props) {
   };
 
   return (
-    <div className="flex flex-col gap-4 font-nunito h-full">
+    <div className="flex flex-col gap-4 font-nunito h-full flex-1 overflow-hidden">
       {/* Category buttons horizontally scrollable or wrapping */}
       <div className="flex flex-wrap gap-2 text-sm justify-start">
         <button className={`inline-flex items-center gap-1 px-3 py-2 rounded-xl font-black transition-all border-2 flex-grow ${active === "background" ? "bg-amber-100 border-amber-300 text-amber-700 shadow-inner" : "bg-white border-slate-100 text-slate-500 hover:bg-slate-50 hover:border-slate-200 shadow-sm"}`} onClick={() => setActive("background")}>
