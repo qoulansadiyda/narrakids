@@ -17,7 +17,7 @@ export default function Landing() {
   return (
     <main
       className="min-h-screen overflow-hidden relative font-nunito text-slate-800 bg-cover bg-center bg-no-repeat bg-fixed"
-      style={{ backgroundImage: "url('/assets/background/landing-bg.png')" }}
+      style={{ backgroundImage: "url('/assets/background/landing-bg.jpg')" }}
     >
       {/* Decorative background elements */}
       <Cloud className="absolute top-10 left-10 w-24 h-24 text-white opacity-30 animate-bounce" style={{animationDuration: '3s'}} />
