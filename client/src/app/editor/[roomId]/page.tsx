@@ -896,8 +896,8 @@ export default function EditorPage() {
       }
     };
 
-    const handleRoomFinished = ({ bookId }: { bookId: string }) => {
-      alert("🎉 Room selesai! Buku kolaborasi telah berhasil disimpan. Anda akan dialihkan ke buku...");
+    const handleRoomFinished = async ({ bookId }: { bookId: string }) => {
+      await showAlert("🎉 Room selesai! Buku kolaborasi telah berhasil disimpan. Anda akan dialihkan ke buku...");
       router.replace(`/book/${bookId}`);
     };
 
