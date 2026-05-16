@@ -6,7 +6,7 @@ import type { Socket } from "socket.io-client";
 import { getSocket } from "@/lib/socket";
 import { isAuthed } from "@/lib/auth";
 import type { ReactNode } from "react";
-import { Sparkles, Palette, Eye, ArrowLeft, Radio, Music, Volume2, Trophy, Box, FastForward, BookOpen, Cloud, Hourglass } from "lucide-react";
+import { Sparkles, Palette, Eye, ArrowLeft, Radio, Music, Volume2, Trophy, Box, FastForward, BookOpen, Cloud, Hourglass, Menu, X, ChevronRight } from "lucide-react";
 
 import { ASSET_REGISTRY } from "@/lib/assets/registry";
 import { addAssetToCanvas } from "@/lib/canvas/addAsset";
@@ -176,6 +176,13 @@ export default function EditorPage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardRow[]>([]);
   const [bookTitle, setBookTitle] = useState<string>('');
   const [panels, setPanels] = useState<Panel[]>([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth >= 1280) {
+      setIsSidebarOpen(true);
+    }
+  }, []);
 
   // ── Audio state ──
   const [currentPageBgm, setCurrentPageBgm] = useState<{ id: string; src: string; name: string } | null>(null);
@@ -1356,6 +1363,15 @@ export default function EditorPage() {
       {/* HEADER */}
       <header className="bg-white px-6 py-4 shadow-[0_4px_0_rgb(224,242,254)] border-b-4 border-sky-200 z-10 flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-3">
+          {!isSidebarOpen && (
+            <button 
+              onClick={() => setIsSidebarOpen(true)}
+              className="flex items-center justify-center p-2.5 rounded-2xl bg-sky-100 text-sky-600 hover:bg-sky-200 transition-colors shadow-sm font-black gap-2 mr-2 border-2 border-sky-300"
+              title="Buka Stiker & Audio"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          )}
           <button onClick={async () => {
             const confirmed = await showConfirm("Yakin mau keluar dari ruang karya? Kamu bisa kehilangan progresmu yang belum disimpan! 😢");
             if (confirmed) router.push("/app");
@@ -1375,11 +1391,31 @@ export default function EditorPage() {
       </header>
 
       {/* MAIN PLAY AREA */}
-      <div className="flex flex-col xl:flex-row gap-6 p-4 md:p-6 flex-1 w-full max-w-[1600px] mx-auto z-10">
+      <div className="flex gap-6 p-4 md:p-6 flex-1 w-full max-w-[1600px] mx-auto z-10 relative overflow-hidden xl:overflow-visible">
 
-      <div className="flex flex-col xl:flex-row gap-6 w-full">
+        {/* OVERLAY for Mobile when sidebar is open */}
+        {isSidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-slate-800/50 z-40 xl:hidden backdrop-blur-sm transition-opacity" 
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
+
         {/* LEFT SIDEBAR (LEADERBOARD & ASSET LIBRARY) */}
-        <div className="flex flex-col gap-6 w-full xl:w-72 shrink-0">
+        <div 
+          className={`
+            fixed top-0 left-0 h-full bg-sky-50 z-50 transform transition-transform duration-300 ease-in-out shadow-2xl overflow-y-auto w-[320px] p-4 sm:p-6 flex flex-col gap-6
+            ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+            xl:relative xl:h-auto xl:bg-transparent xl:shadow-none xl:p-0 xl:w-72 xl:shrink-0 xl:translate-x-0
+            ${!isSidebarOpen && "xl:hidden"}
+          `}
+        >
+          {/* Mobile Sidebar Header */}
+          <div className="flex justify-between items-center xl:hidden bg-white p-3 rounded-2xl border-4 border-slate-100 shadow-sm shrink-0">
+            <h2 className="font-black text-sky-600 uppercase tracking-widest flex items-center gap-2"><Box className="w-5 h-5"/> Peralatan</h2>
+            <button onClick={() => setIsSidebarOpen(false)} className="bg-rose-100 text-rose-500 rounded-xl p-1.5 hover:bg-rose-200 transition-colors border-2 border-rose-200"><X className="w-5 h-5"/></button>
+          </div>
+
           
           {/* Active Turn Audio Status */}
           {isMyTurn && (
@@ -1811,7 +1847,6 @@ export default function EditorPage() {
               </div>
             )}
           </div>
-        </div>
         </div>
       </div>
     </main>
