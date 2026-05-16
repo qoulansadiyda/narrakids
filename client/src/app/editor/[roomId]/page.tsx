@@ -6,7 +6,7 @@ import type { Socket } from "socket.io-client";
 import { getSocket } from "@/lib/socket";
 import { isAuthed } from "@/lib/auth";
 import type { ReactNode } from "react";
-import { Sparkles, Palette, Eye, ArrowLeft, Radio, Music, Volume2, Trophy, Box, FastForward, BookOpen, Cloud, Hourglass, Menu, X, ChevronRight } from "lucide-react";
+import { Sparkles, Palette, Eye, ArrowLeft, Radio, Music, Volume2, Trophy, Box, FastForward, BookOpen, Cloud, Hourglass, Menu, X, ChevronRight, Image as ImageIcon, Smile, MessageSquare, Sticker } from "lucide-react";
 
 import { ASSET_REGISTRY } from "@/lib/assets/registry";
 import { addAssetToCanvas } from "@/lib/canvas/addAsset";
@@ -176,13 +176,14 @@ export default function EditorPage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardRow[]>([]);
   const [bookTitle, setBookTitle] = useState<string>('');
   const [panels, setPanels] = useState<Panel[]>([]);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  useEffect(() => {
+  
+  type TabType = "leaderboard" | "turn" | "background" | "character" | "bubble_text" | "property" | "bgm" | "sfx" | null;
+  const [activeTab, setActiveTab] = useState<TabType>(() => {
     if (typeof window !== "undefined" && window.innerWidth >= 1280) {
-      setIsSidebarOpen(true);
+      return "character";
     }
-  }, []);
+    return null;
+  });
 
   // ── Audio state ──
   const [currentPageBgm, setCurrentPageBgm] = useState<{ id: string; src: string; name: string } | null>(null);
@@ -1363,15 +1364,6 @@ export default function EditorPage() {
       {/* HEADER */}
       <header className="bg-white px-6 py-4 shadow-[0_4px_0_rgb(224,242,254)] border-b-4 border-sky-200 z-10 flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          {!isSidebarOpen && (
-            <button 
-              onClick={() => setIsSidebarOpen(true)}
-              className="flex items-center justify-center p-2.5 rounded-2xl bg-sky-100 text-sky-600 hover:bg-sky-200 transition-colors shadow-sm font-black gap-2 mr-2 border-2 border-sky-300"
-              title="Buka Stiker & Audio"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-          )}
           <button onClick={async () => {
             const confirmed = await showConfirm("Yakin mau keluar dari ruang karya? Kamu bisa kehilangan progresmu yang belum disimpan! 😢");
             if (confirmed) router.push("/app");
@@ -1391,171 +1383,249 @@ export default function EditorPage() {
       </header>
 
       {/* MAIN PLAY AREA */}
-      <div className="flex gap-6 p-4 md:p-6 flex-1 w-full max-w-[1600px] mx-auto z-10 relative overflow-hidden xl:overflow-visible">
+      <div className="flex flex-1 w-full max-w-[1600px] mx-auto z-10 relative overflow-hidden bg-sky-50" style={{ height: "calc(100vh - 84px)" }}>
+        
+        {/* VERTICAL TAB BAR */}
+        <div className="w-20 shrink-0 bg-white border-r-4 border-sky-200 z-30 flex flex-col items-center py-4 gap-4 overflow-y-auto custom-scrollbar shadow-sm">
+          <button 
+            onClick={() => setActiveTab(activeTab === "turn" ? null : "turn")} 
+            className={`w-14 h-14 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all ${activeTab === "turn" ? "bg-emerald-100 text-emerald-600 shadow-inner border-2 border-emerald-300" : "text-slate-500 hover:bg-slate-100 hover:text-slate-700 border-2 border-transparent"}`}
+            title="Giliranmu"
+          >
+            <Radio className="w-5 h-5" />
+            <span className="text-[9px] font-black tracking-widest uppercase mt-0.5">Giliran</span>
+          </button>
+          
+          <button 
+            onClick={() => setActiveTab(activeTab === "leaderboard" ? null : "leaderboard")} 
+            className={`w-14 h-14 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all ${activeTab === "leaderboard" ? "bg-yellow-100 text-yellow-600 shadow-inner border-2 border-yellow-300" : "text-slate-500 hover:bg-slate-100 hover:text-slate-700 border-2 border-transparent"}`}
+            title="Papan Peringkat"
+          >
+            <Trophy className="w-5 h-5" />
+            <span className="text-[9px] font-black tracking-widest uppercase mt-0.5">Skor</span>
+          </button>
 
-        {/* OVERLAY for Mobile when sidebar is open */}
-        {isSidebarOpen && (
-          <div 
-            className="fixed inset-0 bg-slate-800/50 z-40 xl:hidden backdrop-blur-sm transition-opacity" 
-            onClick={() => setIsSidebarOpen(false)}
-          />
-        )}
+          <div className="w-10 h-1 bg-slate-100 rounded-full my-1 shrink-0" />
 
-        {/* LEFT SIDEBAR (LEADERBOARD & ASSET LIBRARY) */}
+          <button 
+            onClick={() => setActiveTab(activeTab === "background" ? null : "background")} 
+            className={`w-14 h-14 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all ${activeTab === "background" ? "bg-amber-100 text-amber-600 shadow-inner border-2 border-amber-300" : "text-slate-500 hover:bg-slate-100 hover:text-slate-700 border-2 border-transparent"}`}
+            title="Latar Belakang"
+          >
+            <ImageIcon className="w-5 h-5" />
+            <span className="text-[9px] font-black tracking-widest uppercase mt-0.5">Latar</span>
+          </button>
+
+          <button 
+            onClick={() => setActiveTab(activeTab === "character" ? null : "character")} 
+            className={`w-14 h-14 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all ${activeTab === "character" ? "bg-emerald-100 text-emerald-600 shadow-inner border-2 border-emerald-300" : "text-slate-500 hover:bg-slate-100 hover:text-slate-700 border-2 border-transparent"}`}
+            title="Karakter"
+          >
+            <Smile className="w-5 h-5" />
+            <span className="text-[9px] font-black tracking-widest uppercase mt-0.5">Karakter</span>
+          </button>
+
+          <button 
+            onClick={() => setActiveTab(activeTab === "bubble_text" ? null : "bubble_text")} 
+            className={`w-14 h-14 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all ${activeTab === "bubble_text" ? "bg-sky-100 text-sky-600 shadow-inner border-2 border-sky-300" : "text-slate-500 hover:bg-slate-100 hover:text-slate-700 border-2 border-transparent"}`}
+            title="Teks"
+          >
+            <MessageSquare className="w-5 h-5" />
+            <span className="text-[9px] font-black tracking-widest uppercase mt-0.5">Teks</span>
+          </button>
+
+          <button 
+            onClick={() => setActiveTab(activeTab === "property" ? null : "property")} 
+            className={`w-14 h-14 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all ${activeTab === "property" ? "bg-rose-100 text-rose-600 shadow-inner border-2 border-rose-300" : "text-slate-500 hover:bg-slate-100 hover:text-slate-700 border-2 border-transparent"}`}
+            title="Stiker & Properti"
+          >
+            <Sticker className="w-5 h-5" />
+            <span className="text-[9px] font-black tracking-widest uppercase mt-0.5">Stiker</span>
+          </button>
+
+          <div className="w-10 h-1 bg-slate-100 rounded-full my-1 shrink-0" />
+
+          <button 
+            onClick={() => setActiveTab(activeTab === "bgm" ? null : "bgm")} 
+            className={`w-14 h-14 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all ${activeTab === "bgm" ? "bg-purple-100 text-purple-600 shadow-inner border-2 border-purple-300" : "text-slate-500 hover:bg-slate-100 hover:text-slate-700 border-2 border-transparent"}`}
+            title="BGM Musik"
+          >
+            <Music className="w-5 h-5" />
+            <span className="text-[9px] font-black tracking-widest uppercase mt-0.5">BGM</span>
+          </button>
+
+          <button 
+            onClick={() => setActiveTab(activeTab === "sfx" ? null : "sfx")} 
+            className={`w-14 h-14 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all ${activeTab === "sfx" ? "bg-blue-100 text-blue-600 shadow-inner border-2 border-blue-300" : "text-slate-500 hover:bg-slate-100 hover:text-slate-700 border-2 border-transparent"}`}
+            title="SFX Efek Suara"
+          >
+            <Volume2 className="w-5 h-5" />
+            <span className="text-[9px] font-black tracking-widest uppercase mt-0.5">SFX</span>
+          </button>
+        </div>
+
+        {/* EXPANDABLE DRAWER PANEL */}
         <div 
           className={`
-            fixed top-0 left-0 h-full bg-sky-50 z-50 transform transition-transform duration-300 ease-in-out shadow-2xl overflow-y-auto w-[320px] p-4 sm:p-6 flex flex-col gap-6
-            ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
-            xl:relative xl:h-auto xl:bg-transparent xl:shadow-none xl:p-0 xl:w-72 xl:shrink-0 xl:translate-x-0
-            ${!isSidebarOpen && "xl:hidden"}
+            h-full bg-white z-20 flex flex-col shrink-0 overflow-hidden transform transition-all duration-300 ease-in-out border-sky-200 shadow-lg
+            ${activeTab ? "w-[340px] translate-x-0 border-r-4" : "w-0 -translate-x-full border-none opacity-0"}
           `}
         >
-          {/* Mobile Sidebar Header */}
-          <div className="flex justify-between items-center xl:hidden bg-white p-3 rounded-2xl border-4 border-slate-100 shadow-sm shrink-0">
-            <h2 className="font-black text-sky-600 uppercase tracking-widest flex items-center gap-2"><Box className="w-5 h-5"/> Peralatan</h2>
-            <button onClick={() => setIsSidebarOpen(false)} className="bg-rose-100 text-rose-500 rounded-xl p-1.5 hover:bg-rose-200 transition-colors border-2 border-rose-200"><X className="w-5 h-5"/></button>
+          {/* Drawer Header */}
+          <div className="flex justify-between items-center bg-white p-4 border-b-4 border-slate-100 shrink-0">
+            <h2 className="font-black text-slate-700 uppercase tracking-widest flex items-center gap-2">
+              {activeTab === "turn" && <><Radio className="w-5 h-5 text-emerald-500" /> Giliranmu</>}
+              {activeTab === "leaderboard" && <><Trophy className="w-5 h-5 text-yellow-500" /> Skor Peringkat</>}
+              {activeTab === "background" && <><ImageIcon className="w-5 h-5 text-amber-500" /> Latar Belakang</>}
+              {activeTab === "character" && <><Smile className="w-5 h-5 text-emerald-500" /> Karakter</>}
+              {activeTab === "bubble_text" && <><MessageSquare className="w-5 h-5 text-sky-500" /> Teks</>}
+              {activeTab === "property" && <><Sticker className="w-5 h-5 text-rose-500" /> Stiker & Properti</>}
+              {activeTab === "bgm" && <><Music className="w-5 h-5 text-purple-500" /> Musik BGM</>}
+              {activeTab === "sfx" && <><Volume2 className="w-5 h-5 text-blue-500" /> Efek Suara</>}
+            </h2>
+            <button onClick={() => setActiveTab(null)} className="text-slate-400 hover:text-rose-500 transition-colors bg-slate-100 hover:bg-rose-100 rounded-full p-1"><X className="w-5 h-5"/></button>
           </div>
 
-          
-          {/* Active Turn Audio Status */}
-          {isMyTurn && (
-            <div className="bg-white p-4 rounded-3xl border-4 border-slate-100 shadow-[0_8px_0_rgba(241,245,249)]">
-              <div className="text-sm font-black mb-3 text-emerald-500 uppercase tracking-widest flex items-center gap-2 border-b-2 border-emerald-50 pb-2">
-                <Radio className="w-5 h-5" /> Giliranmu
-              </div>
-              
-              <div className="flex flex-col gap-2">
-                {currentPageBgm ? (
-                  <div className="bg-purple-50 border-2 border-purple-200 text-purple-600 px-3 py-2 rounded-2xl flex items-center justify-between text-xs font-bold shadow-sm group">
-                    <span className="truncate flex-1 inline-flex items-center gap-1"><Music className="w-3 h-3" /> {currentPageBgm.name}</span>
-                    <button onClick={() => setCurrentPageBgm(null)} className="ml-1 shrink-0 bg-white text-purple-400 group-hover:bg-purple-400 group-hover:text-white rounded-full w-5 h-5 flex items-center justify-center font-black transition-colors" title="Hapus BGM">✕</button>
-                  </div>
-                ) : (
-                  <div className="bg-slate-50 border-2 border-dashed border-slate-200 text-slate-400 px-3 py-2 rounded-2xl text-[10px] font-bold shadow-inner inline-flex items-center gap-1">
-                    <Music className="w-3 h-3" /> Meneruskan BGM
-                  </div>
-                )}
-
-                {currentPageSfx ? (
-                  <div className="bg-blue-50 border-2 border-blue-200 text-blue-600 px-3 py-2 rounded-2xl flex items-center justify-between text-xs font-bold shadow-sm group">
-                    <span className="truncate flex-1 inline-flex items-center gap-1"><Volume2 className="w-3 h-3" /> {currentPageSfx.name}</span>
-                    <button onClick={() => setCurrentPageSfx(null)} className="ml-1 shrink-0 bg-white text-blue-400 group-hover:bg-blue-400 group-hover:text-white rounded-full w-5 h-5 flex items-center justify-center font-black transition-colors" title="Hapus SFX">✕</button>
-                  </div>
-                ) : (
-                  <div className="bg-slate-50 border-2 border-dashed border-slate-200 text-slate-400 px-3 py-2 rounded-2xl text-[10px] font-bold shadow-inner inline-flex items-center gap-1">
-                    <Volume2 className="w-3 h-3" /> Tidak Ada Efek Suara
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* LEADERBOARD CARD */}
-          <div className="bg-white p-5 rounded-3xl border-4 border-slate-100 shadow-[0_8px_0_rgba(241,245,249)]">
-            <div className="text-sm font-black mb-4 text-sky-500 uppercase tracking-widest flex items-center gap-2 border-b-2 border-sky-50 pb-3">
-              <Trophy className="w-5 h-5" /> Papan Peringkat
-            </div>
-            {leaderboard.length === 0 ? (
-              <div className="text-slate-400 text-sm text-center italic font-bold my-4 bg-slate-50 py-3 rounded-2xl border-2 border-dashed border-slate-200">Belum ada skor 😢</div>
-            ) : (
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-4 flex flex-col">
+            {activeTab === "turn" && (
               <div className="flex flex-col gap-3">
-                {leaderboard.map((p, idx) => (
-                  <div key={p.sid} className="flex items-center justify-between bg-yellow-50 px-4 py-3 rounded-2xl border-2 border-yellow-100 cursor-default hover:bg-yellow-100 transition-colors">
-                    <div className="flex items-center gap-3 overflow-hidden">
-                      <span className="font-black text-yellow-500 w-5 flex-shrink-0">{idx+1}.</span>
-                      <span className="font-bold text-slate-700 truncate text-sm">
-                        {p.username || p.sid.slice(0, 4)} {p.sid === mySocketId && <span className="text-[10px] bg-sky-200 text-sky-800 px-1.5 py-0.5 rounded-md ml-1 inline-block align-middle transform -translate-y-0.5 uppercase tracking-wider font-black">(Kamu)</span>}
-                      </span>
+                {isMyTurn ? (
+                  <>
+                    <div className="bg-emerald-50 border-2 border-emerald-200 text-emerald-600 p-4 rounded-2xl font-black text-sm text-center shadow-inner">
+                      Yay! ✨ Sekarang giliranmu menggambar di kanvas!
                     </div>
-                    <span className="font-black text-yellow-600 bg-yellow-200 px-3 py-1 rounded-xl text-sm ml-2 shadow-inner border border-yellow-300">{p.total}</span>
+                    <div className="mt-4 font-black text-slate-500 uppercase tracking-widest text-xs border-b-2 border-slate-100 pb-2">Audio Halaman Ini</div>
+                    {currentPageBgm ? (
+                      <div className="bg-purple-50 border-2 border-purple-200 text-purple-600 px-3 py-3 rounded-2xl flex items-center justify-between text-xs font-bold shadow-sm group">
+                        <span className="truncate flex-1 inline-flex items-center gap-2"><Music className="w-4 h-4" /> {currentPageBgm.name}</span>
+                        <button onClick={() => setCurrentPageBgm(null)} className="ml-2 shrink-0 bg-white text-purple-400 hover:bg-purple-500 hover:text-white border-2 border-purple-200 rounded-full w-6 h-6 flex items-center justify-center font-black transition-colors" title="Hapus BGM"><X className="w-3 h-3"/></button>
+                      </div>
+                    ) : (
+                      <div className="bg-slate-50 border-2 border-dashed border-slate-200 text-slate-400 px-3 py-3 rounded-2xl text-xs font-bold shadow-inner inline-flex items-center gap-2">
+                        <Music className="w-4 h-4" /> BGM Meneruskan Halaman Sebelumnya
+                      </div>
+                    )}
+
+                    {currentPageSfx ? (
+                      <div className="bg-blue-50 border-2 border-blue-200 text-blue-600 px-3 py-3 rounded-2xl flex items-center justify-between text-xs font-bold shadow-sm group">
+                        <span className="truncate flex-1 inline-flex items-center gap-2"><Volume2 className="w-4 h-4" /> {currentPageSfx.name}</span>
+                        <button onClick={() => setCurrentPageSfx(null)} className="ml-2 shrink-0 bg-white text-blue-400 hover:bg-blue-500 hover:text-white border-2 border-blue-200 rounded-full w-6 h-6 flex items-center justify-center font-black transition-colors" title="Hapus SFX"><X className="w-3 h-3"/></button>
+                      </div>
+                    ) : (
+                      <div className="bg-slate-50 border-2 border-dashed border-slate-200 text-slate-400 px-3 py-3 rounded-2xl text-xs font-bold shadow-inner inline-flex items-center gap-2">
+                        <Volume2 className="w-4 h-4" /> Tidak Ada Efek Suara
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="bg-slate-50 border-2 border-slate-200 text-slate-500 p-6 rounded-2xl font-bold text-center shadow-inner flex flex-col items-center gap-3">
+                    <Hourglass className="w-8 h-8 text-slate-400" />
+                    Tunggu sebentar, ini bukan giliranmu ya! 😊
                   </div>
-                ))}
+                )}
+              </div>
+            )}
+
+            {activeTab === "leaderboard" && (
+              <div className="flex flex-col gap-3">
+                {leaderboard.length === 0 ? (
+                  <div className="text-slate-400 text-sm text-center italic font-bold my-4 bg-slate-50 py-3 rounded-2xl border-2 border-dashed border-slate-200">Belum ada skor 😢</div>
+                ) : (
+                  leaderboard.map((p, idx) => (
+                    <div key={p.sid} className="flex items-center justify-between bg-yellow-50 px-4 py-3 rounded-2xl border-2 border-yellow-100 cursor-default hover:bg-yellow-100 transition-colors">
+                      <div className="flex items-center gap-3 overflow-hidden">
+                        <span className="font-black text-yellow-500 w-5 flex-shrink-0">{idx+1}.</span>
+                        <span className="font-bold text-slate-700 truncate text-sm">
+                          {p.username || p.sid.slice(0, 4)} {p.sid === mySocketId && <span className="text-[10px] bg-sky-200 text-sky-800 px-1.5 py-0.5 rounded-md ml-1 inline-block align-middle transform -translate-y-0.5 uppercase tracking-wider font-black">(Kamu)</span>}
+                        </span>
+                      </div>
+                      <span className="font-black text-yellow-600 bg-yellow-200 px-3 py-1 rounded-xl text-sm ml-2 shadow-inner border border-yellow-300">{p.total}</span>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+
+            {["background", "character", "bubble_text", "property", "bgm", "sfx"].includes(activeTab as string) && (
+              <div className="h-full flex flex-col flex-1">
+                <AssetLibrary
+                  category={activeTab as any}
+                  onPick={async (category, index) => {
+                    if (viewingHistorySpread) { await showAlert("Ngintip buku dulu ya! Tutup layarnya di area bawah untuk nambahin karakter! 👀"); return; }
+                    const c = getCanvasBySide(editableSideRef.current);
+                    if (!c) return;
+
+                    if (!isMyTurnRef.current) { await showAlert("Sabar ya, ini bukan giliran kamu 🙂"); return; }
+
+                    const asset = (ASSET_REGISTRY as any)[category]?.[index];
+                    if (!asset) return;
+
+                    await addAssetToCanvas({
+                      canvas: c,
+                      asset,
+                      canEdit: isMyTurnRef.current,
+                    });
+
+                    applyInteractivity(c, isMyTurnRef.current);
+                    c.requestRenderAll();
+                    (c as any)._sendUpdate?.();
+                  }}
+                  onPickAudio={async (category, assetId, src) => {
+                    if (viewingHistorySpread) { await showAlert("Ngintip buku dulu ya! 👀"); return; }
+                    if (!isMyTurnRef.current) { await showAlert("Sabar ya, ini bukan giliran kamu 🙂"); return; }
+
+                    const name = assetId.replace(/^(bgm|sfx)-/, '').replace(/-/g, ' ');
+                    if (category === "bgm") {
+                      setCurrentPageBgm({ id: assetId, src, name });
+                    } else {
+                      setCurrentPageSfx({ id: assetId, src, name });
+                    }
+                  }}
+                  onUpload={async (file) => {
+                    if (viewingHistorySpread) { await showAlert("Ngintip buku dulu ya! 👀"); return; }
+                    const c = getCanvasBySide(editableSideRef.current);
+                    if (!c) return;
+
+                    if (!isMyTurnRef.current) { await showAlert("Sabar ya, ini bukan giliran kamu 🙂"); return; }
+
+                    try {
+                      const reader = new FileReader();
+                      reader.onload = async (e) => {
+                        const dataUrl = e.target?.result as string;
+                        if (!dataUrl) return;
+
+                        const base64Asset = {
+                          id: `custom-${Date.now()}`,
+                          name: file.name,
+                          src: dataUrl,
+                          category: "property" as const,
+                          defaultScale: 0.5,
+                        };
+
+                        await addAssetToCanvas({
+                          canvas: c,
+                          asset: base64Asset,
+                          canEdit: isMyTurnRef.current,
+                        });
+
+                        applyInteractivity(c, isMyTurnRef.current);
+                        c.requestRenderAll();
+                        (c as any)._sendUpdate?.();
+                      };
+                      reader.readAsDataURL(file);
+                    } catch (err) {
+                      console.error("Upload error:", err);
+                      await showAlert("Yah! Gagal Mengunggah Gambar... Coba Lagi Ya!");
+                    }
+                  }}
+                />
               </div>
             )}
           </div>
-
-          {/* ASSET LIBRARY CARD */}
-          <div className="bg-white p-5 rounded-3xl border-4 border-slate-100 shadow-[0_8px_0_rgba(241,245,249)] h-[500px] xl:h-auto xl:flex-1 flex flex-col xl:max-h-[700px]">
-            <div className="text-sm font-black mb-4 text-sky-500 uppercase tracking-widest flex items-center gap-2 border-b-2 border-sky-50 pb-3 shrink-0">
-              <Box className="w-5 h-5" /> Stiker & Audio
-            </div>
-
-            <div className="flex-1 flex flex-col overflow-hidden min-h-[400px]">
-              <AssetLibrary
-                onPick={async (category, index) => {
-                  if (viewingHistorySpread) { await showAlert("Ngintip buku dulu ya! Tutup layarnya di area bawah untuk nambahin karakter! 👀"); return; }
-                  const c = getCanvasBySide(editableSideRef.current);
-                  if (!c) return;
-
-                  if (!isMyTurnRef.current) { await showAlert("Sabar ya, ini bukan giliran kamu 🙂"); return; }
-
-                  const asset = (ASSET_REGISTRY as any)[category]?.[index];
-                  if (!asset) return;
-
-                  await addAssetToCanvas({
-                    canvas: c,
-                    asset,
-                    canEdit: isMyTurnRef.current,
-                  });
-
-                  applyInteractivity(c, isMyTurnRef.current);
-                  c.requestRenderAll();
-                  (c as any)._sendUpdate?.();
-                }}
-                onPickAudio={async (category, assetId, src) => {
-                  if (viewingHistorySpread) { await showAlert("Ngintip buku dulu ya! 👀"); return; }
-                  if (!isMyTurnRef.current) { await showAlert("Sabar ya, ini bukan giliran kamu 🙂"); return; }
-
-                  const name = assetId.replace(/^(bgm|sfx)-/, '').replace(/-/g, ' ');
-                  if (category === "bgm") {
-                    setCurrentPageBgm({ id: assetId, src, name });
-                  } else {
-                    setCurrentPageSfx({ id: assetId, src, name });
-                  }
-                }}
-                onUpload={async (file) => {
-                  if (viewingHistorySpread) { await showAlert("Ngintip buku dulu ya! 👀"); return; }
-                  const c = getCanvasBySide(editableSideRef.current);
-                  if (!c) return;
-
-                  if (!isMyTurnRef.current) { await showAlert("Sabar ya, ini bukan giliran kamu 🙂"); return; }
-
-                  try {
-                    const reader = new FileReader();
-                    reader.onload = async (e) => {
-                      const dataUrl = e.target?.result as string;
-                      if (!dataUrl) return;
-
-                      const base64Asset = {
-                        id: `custom-${Date.now()}`,
-                        name: file.name,
-                        src: dataUrl,
-                        category: "property" as const, // Treat custom images as movable properties
-                        defaultScale: 0.5,
-                      };
-
-                      await addAssetToCanvas({
-                        canvas: c,
-                        asset: base64Asset,
-                        canEdit: isMyTurnRef.current,
-                      });
-
-                      applyInteractivity(c, isMyTurnRef.current);
-                      c.requestRenderAll();
-                      (c as any)._sendUpdate?.();
-                    };
-                    reader.readAsDataURL(file);
-                  } catch (err) {
-                    console.error("Upload error:", err);
-                    await showAlert("Yah! Gagal Mengunggah Gambar... Coba Lagi Ya!");
-                  }
-                }}
-              />
-            </div>
-          </div>
         </div>
 
-        <div className="flex-1 min-w-0">
+        {/* RIGHT PLAY AREA */}
+        <div className="flex-1 flex flex-col min-w-0 h-full p-4 md:p-6 overflow-y-auto custom-scrollbar relative">
           <div ref={spreadWrapRef} className="w-full">
             <div className="flex flex-wrap items-start justify-center" style={{ gap: SPREAD_GAP }}>
               <div style={{ position: "relative" }}>
