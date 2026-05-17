@@ -1468,6 +1468,42 @@ export default function EditorPage() {
 
           <div className="flex-1 overflow-y-auto custom-scrollbar p-4 flex flex-col">
 
+            {activeTab === "bgm" && (
+              <div className="mb-4">
+                {currentPageBgm ? (
+                  <div className="bg-purple-50 border-2 border-purple-200 text-purple-600 px-4 py-3 rounded-2xl flex flex-col gap-2 text-sm font-bold shadow-sm">
+                    <span className="text-xs font-black tracking-widest uppercase text-purple-400">Sedang Aktif:</span>
+                    <div className="flex items-center justify-between">
+                      <span className="truncate flex-1 inline-flex items-center gap-2"><Music className="w-4 h-4" /> {currentPageBgm.name}</span>
+                      <button onClick={() => setCurrentPageBgm(null)} className="ml-2 shrink-0 bg-white text-purple-400 hover:bg-purple-500 hover:text-white border-2 border-purple-200 rounded-full w-6 h-6 flex items-center justify-center font-black transition-colors" title="Hapus BGM"><X className="w-3 h-3"/></button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-slate-50 border-2 border-dashed border-slate-200 text-slate-400 px-4 py-3 rounded-2xl text-xs font-bold shadow-inner flex items-center gap-2 w-full justify-center">
+                    <Music className="w-4 h-4" /> Belum ada lagu yang dipilih
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === "sfx" && (
+              <div className="mb-4">
+                {currentPageSfx ? (
+                  <div className="bg-blue-50 border-2 border-blue-200 text-blue-600 px-4 py-3 rounded-2xl flex flex-col gap-2 text-sm font-bold shadow-sm">
+                    <span className="text-xs font-black tracking-widest uppercase text-blue-400">Sedang Aktif:</span>
+                    <div className="flex items-center justify-between">
+                      <span className="truncate flex-1 inline-flex items-center gap-2"><Volume2 className="w-4 h-4" /> {currentPageSfx.name}</span>
+                      <button onClick={() => setCurrentPageSfx(null)} className="ml-2 shrink-0 bg-white text-blue-400 hover:bg-blue-500 hover:text-white border-2 border-blue-200 rounded-full w-6 h-6 flex items-center justify-center font-black transition-colors" title="Hapus SFX"><X className="w-3 h-3"/></button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-slate-50 border-2 border-dashed border-slate-200 text-slate-400 px-4 py-3 rounded-2xl text-xs font-bold shadow-inner flex items-center gap-2 w-full justify-center">
+                    <Volume2 className="w-4 h-4" /> Belum ada SFX yang dipilih
+                  </div>
+                )}
+              </div>
+            )}
+
             {["background", "character", "bubble_text", "property", "bgm", "sfx"].includes(activeTab as string) && (
               <div className="h-full flex flex-col flex-1">
                 <AssetLibrary
@@ -1548,24 +1584,6 @@ export default function EditorPage() {
 
         {/* RIGHT PLAY AREA */}
         <div className="flex-1 flex flex-col min-w-0 h-full p-4 md:p-6 overflow-y-auto custom-scrollbar relative">
-          {/* Audio Floating Chips */}
-          <div className="absolute top-4 right-6 z-20 flex flex-col gap-2 pointer-events-none">
-            {currentPageBgm && (
-              <div className="bg-purple-50/90 backdrop-blur-sm border-2 border-purple-200 text-purple-600 px-3 py-2 rounded-2xl flex items-center gap-2 text-[10px] font-bold shadow-sm pointer-events-auto group">
-                <Music className="w-3 h-3 shrink-0" />
-                <span className="truncate max-w-[120px]">{currentPageBgm.name}</span>
-                <button onClick={() => setCurrentPageBgm(null)} className="ml-1 shrink-0 bg-white text-purple-400 hover:bg-purple-500 hover:text-white rounded-full w-4 h-4 flex items-center justify-center transition-colors"><X className="w-2.5 h-2.5"/></button>
-              </div>
-            )}
-            {currentPageSfx && (
-              <div className="bg-blue-50/90 backdrop-blur-sm border-2 border-blue-200 text-blue-600 px-3 py-2 rounded-2xl flex items-center gap-2 text-[10px] font-bold shadow-sm pointer-events-auto group">
-                <Volume2 className="w-3 h-3 shrink-0" />
-                <span className="truncate max-w-[120px]">{currentPageSfx.name}</span>
-                <button onClick={() => setCurrentPageSfx(null)} className="ml-1 shrink-0 bg-white text-blue-400 hover:bg-blue-500 hover:text-white rounded-full w-4 h-4 flex items-center justify-center transition-colors"><X className="w-2.5 h-2.5"/></button>
-              </div>
-            )}
-          </div>
-          
           <div ref={spreadWrapRef} className="w-full">
             <div className="flex flex-nowrap items-start justify-center" style={{ gap: SPREAD_GAP }}>
               <div style={{ position: "relative" }}>
