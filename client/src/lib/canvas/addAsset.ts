@@ -109,6 +109,10 @@ export async function addAssetToCanvas(opts: {
         let sc = asset.defaultScale ?? 0.5;
 
         if (asset.category === "background") {
+          // Hapus background lama agar tidak menumpuk
+          const existingBgs = canvas.getObjects().filter((o: any) => o.data?.category === "background");
+          existingBgs.forEach((bg: any) => canvas.remove(bg));
+
           const sX = cw / img.width;
           const sY = ch / img.height;
           const sCover = Math.max(sX, sY); // Aspect cover
