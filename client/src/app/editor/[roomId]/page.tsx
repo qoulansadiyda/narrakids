@@ -1384,7 +1384,7 @@ export default function EditorPage() {
       </header>
 
       {/* MAIN PLAY AREA */}
-      <div className="flex flex-1 w-full max-w-[1600px] mx-auto z-10 relative overflow-hidden bg-sky-50" style={{ height: "calc(100vh - 84px)" }}>
+      <div className="flex flex-1 w-full z-10 relative overflow-hidden bg-sky-50" style={{ height: "calc(100vh - 84px)" }}>
         
         {/* VERTICAL TAB BAR */}
         <div className="w-20 shrink-0 bg-white border-r-4 border-sky-200 z-30 flex flex-col items-center py-4 gap-4 overflow-y-auto custom-scrollbar shadow-sm">
@@ -1593,7 +1593,7 @@ export default function EditorPage() {
 
                 <div
                   style={{ width: pageSize.w * canvasScale, height: pageSize.h * canvasScale, position: "relative" }}
-                  className={`border rounded overflow-hidden ${editableSide === "left" && !viewingHistorySpread ? "ring-4 ring-purple-600 border-transparent bg-white shadow-lg" : "bg-white"}`}
+                  className={`border rounded ${editableSide === "left" && !viewingHistorySpread ? "ring-4 ring-purple-600 border-transparent bg-white shadow-lg" : "bg-white"}`}
                 >
                   <div 
                     ref={leftWrapRef}
@@ -1676,7 +1676,7 @@ export default function EditorPage() {
 
                 <div
                   style={{ width: pageSize.w * canvasScale, height: pageSize.h * canvasScale, position: "relative" }}
-                  className={`border rounded overflow-hidden ${editableSide === "right" && !viewingHistorySpread ? "ring-4 ring-purple-600 border-transparent bg-white shadow-lg" : "bg-white"}`}
+                  className={`border rounded ${editableSide === "right" && !viewingHistorySpread ? "ring-4 ring-purple-600 border-transparent bg-white shadow-lg" : "bg-white"}`}
                 >
                   <div 
                     ref={rightWrapRef}
