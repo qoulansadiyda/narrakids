@@ -144,12 +144,12 @@ export async function addAssetToCanvas(opts: {
 
         img.data = { category: asset.category, id: asset.id };
 
-        if (asset.category === "background") {
-          if (typeof canvas.sendToBack === "function") canvas.sendToBack(img);
-          else if (typeof canvas.sendObjectToBack === "function") canvas.sendObjectToBack(img);
-        }
-
         canvas.add(img);
+
+        if (asset.category === "background") {
+          if (typeof canvas.sendObjectToBack === "function") canvas.sendObjectToBack(img);
+          else if (typeof canvas.sendToBack === "function") canvas.sendToBack(img);
+        }
         if (canEdit && asset.category !== "background") {
           canvas.setActiveObject(img);
         }
