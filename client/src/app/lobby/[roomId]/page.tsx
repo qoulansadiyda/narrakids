@@ -318,15 +318,17 @@ export default function Lobby() {
                       const val = e.target.value;
                       if (val === "") {
                         setCanvasQuota("");
-                      } else {
-                        setCanvasQuota(parseInt(val) || 1);
+                        return;
+                      }
+                      const num = parseInt(val);
+                      if (!isNaN(num) && num >= 1 && num <= 10) {
+                        setCanvasQuota(num);
                       }
                     }}
                     onBlur={() => {
-                      let val = parseInt(String(canvasQuota)) || 1;
-                      if (val > 10) val = 10;
-                      if (val < 1) val = 1;
-                      setCanvasQuota(val);
+                      if (canvasQuota === "" || Number(canvasQuota) < 1) {
+                        setCanvasQuota(1);
+                      }
                     }}
                   />
                   <p className="text-xs text-orange-600/70 mt-1 font-semibold">
