@@ -143,7 +143,7 @@ export default function Lobby() {
   }, [roomId]);
 
   const [turnDuration, setTurnDuration] = useState<number>(0);
-  const [canvasQuota, setCanvasQuota] = useState<number>(2);
+  const [canvasQuota, setCanvasQuota] = useState<number | string>(2);
   const [bookTitle, setBookTitle] = useState<string>("");
 
   // Sinkronisasi otomatis dari Host ke Server setiap kali Host mengganti/mengetik pengaturan
@@ -315,7 +315,15 @@ export default function Lobby() {
                     className="w-full bg-white border-2 border-orange-200 text-orange-800 font-bold rounded-xl px-3 py-3 outline-none focus:border-orange-400 transition-colors"
                     value={canvasQuota}
                     onChange={(e) => {
-                      let val = parseInt(e.target.value) || 1;
+                      const val = e.target.value;
+                      if (val === "") {
+                        setCanvasQuota("");
+                      } else {
+                        setCanvasQuota(parseInt(val) || 1);
+                      }
+                    }}
+                    onBlur={() => {
+                      let val = parseInt(String(canvasQuota)) || 1;
                       if (val > 10) val = 10;
                       if (val < 1) val = 1;
                       setCanvasQuota(val);
