@@ -6,7 +6,7 @@ import type { Socket } from "socket.io-client";
 import { getSocket } from "@/lib/socket";
 import { isAuthed } from "@/lib/auth";
 import type { ReactNode } from "react";
-import { Sparkles, Palette, Eye, ArrowLeft, Radio, Music, Volume2, Trophy, Box, FastForward, BookOpen, Cloud, Hourglass, Menu, X, ChevronRight, Image as ImageIcon, Smile, MessageSquare, Sticker } from "lucide-react";
+import { Sparkles, Palette, Eye, ArrowLeft, Radio, Music, Volume2, Trophy, Box, FastForward, BookOpen, Cloud, Hourglass, Menu, X, ChevronRight, Image as ImageIcon, Smile, MessageSquare, Sticker, RotateCcw, RotateCw, FlipHorizontal, FlipVertical, MoveDown, MoveUp, Lock, Unlock, Trash2, AlignLeft, AlignCenter, Bold, Italic, Underline } from "lucide-react";
 
 import { ASSET_REGISTRY } from "@/lib/assets/registry";
 import { addAssetToCanvas } from "@/lib/canvas/addAsset";
@@ -180,7 +180,7 @@ export default function EditorPage() {
   type TabType = "background" | "character" | "bubble_text" | "property" | "bgm" | "sfx" | null;
   const [activeTab, setActiveTab] = useState<TabType>(() => {
     if (typeof window !== "undefined" && window.innerWidth >= 1280) {
-      return "character";
+      return "background";
     }
     return null;
   });
@@ -1459,7 +1459,7 @@ export default function EditorPage() {
               {activeTab === "background" && <><ImageIcon className="w-5 h-5 text-amber-500" /> Latar Belakang</>}
               {activeTab === "character" && <><Smile className="w-5 h-5 text-emerald-500" /> Karakter</>}
               {activeTab === "bubble_text" && <><MessageSquare className="w-5 h-5 text-sky-500" /> Teks</>}
-              {activeTab === "property" && <><Sticker className="w-5 h-5 text-rose-500" /> Stiker & Properti</>}
+              {activeTab === "property" && <><Sticker className="w-5 h-5 text-rose-500" /> Properti</>}
               {activeTab === "bgm" && <><Music className="w-5 h-5 text-purple-500" /> Musik BGM</>}
               {activeTab === "sfx" && <><Volume2 className="w-5 h-5 text-blue-500" /> Efek Suara</>}
             </h2>
@@ -1996,7 +1996,7 @@ function FloatingToolbar({
                 onClick={() => onTextPropChange("fontWeight", textProps.fontWeight === "bold" ? "normal" : "bold")}
                 title="Bold"
               >
-                <span className="font-bold">B</span>
+                <Bold className="w-4 h-4" />
               </button>
 
               {/* Italic */}
@@ -2006,7 +2006,7 @@ function FloatingToolbar({
                 onClick={() => onTextPropChange("fontStyle", textProps.fontStyle === "italic" ? "normal" : "italic")}
                 title="Italic"
               >
-                <span className="italic font-serif">I</span>
+                <Italic className="w-4 h-4" />
               </button>
 
               {/* Underline */}
@@ -2016,7 +2016,7 @@ function FloatingToolbar({
                 onClick={() => onTextPropChange("underline", !textProps.underline)}
                 title="Underline"
               >
-                <span className="underline">U</span>
+                <Underline className="w-4 h-4" />
               </button>
 
               {/* Align Left */}
@@ -2026,7 +2026,7 @@ function FloatingToolbar({
                 onClick={() => onTextPropChange("textAlign", "left")}
                 title="Align Left"
               >
-                ⇤
+                <AlignLeft className="w-4 h-4" />
               </button>
               
               {/* Align Center */}
@@ -2036,7 +2036,7 @@ function FloatingToolbar({
                 onClick={() => onTextPropChange("textAlign", "center")}
                 title="Align Center"
               >
-                ⇥⇤
+                <AlignCenter className="w-4 h-4" />
               </button>
 
               {/* Text Color */}
@@ -2054,28 +2054,28 @@ function FloatingToolbar({
         {!isText && (
           <>
             <button type="button" className={isLocked ? disabledBtnClass : btnClass} onClick={isLocked ? undefined : onRotateLeft} title="Rotate Left">
-              ↺
+              <RotateCcw className="w-4 h-4" />
             </button>
             <button type="button" className={isLocked ? disabledBtnClass : btnClass} onClick={isLocked ? undefined : onRotateRight} title="Rotate Right">
-              ↻
+              <RotateCw className="w-4 h-4" />
             </button>
 
             <div className="w-px h-5 bg-zinc-600 mx-0.5" />
 
             <button type="button" className={isLocked ? disabledBtnClass : btnClass} onClick={isLocked ? undefined : onFlipH} title="Flip Horizontal">
-              ↔
+              <FlipHorizontal className="w-4 h-4" />
             </button>
             <button type="button" className={isLocked ? disabledBtnClass : btnClass} onClick={isLocked ? undefined : onFlipV} title="Flip Vertical">
-              ↕
+              <FlipVertical className="w-4 h-4" />
             </button>
 
             <div className="w-px h-5 bg-zinc-600 mx-0.5" />
 
             <button type="button" className={isLocked ? disabledBtnClass : btnClass} onClick={isLocked ? undefined : onLayerDown} title="Layer Turun">
-              ⬇
+              <MoveDown className="w-4 h-4" />
             </button>
             <button type="button" className={isLocked ? disabledBtnClass : btnClass} onClick={isLocked ? undefined : onLayerUp} title="Layer Naik">
-              ⬆
+              <MoveUp className="w-4 h-4" />
             </button>
 
             <div className="w-px h-5 bg-zinc-600 mx-0.5" />
@@ -2083,23 +2083,23 @@ function FloatingToolbar({
             <button
               type="button"
               className={`w-8 h-8 flex items-center justify-center rounded transition-colors text-sm cursor-pointer ${
-                isLocked ? "bg-amber-500 hover:bg-amber-600" : "hover:bg-zinc-600"
+                isLocked ? "bg-amber-500 hover:bg-amber-600 text-white" : "hover:bg-zinc-600"
               }`}
               onClick={onLockToggle}
               title={isLocked ? "Unlock" : "Lock"}
             >
-              {isLocked ? "🔒" : "🔓"}
+              {isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
             </button>
 
             <div className="w-px h-5 bg-zinc-600 mx-0.5" />
 
             <button
               type="button"
-              className={isLocked ? disabledBtnClass : "w-8 h-8 flex items-center justify-center rounded hover:bg-red-600 transition-colors text-sm cursor-pointer"}
+              className={isLocked ? disabledBtnClass : "w-8 h-8 flex items-center justify-center rounded hover:bg-red-600 transition-colors text-sm cursor-pointer text-red-400 hover:text-white"}
               onClick={isLocked ? undefined : onDelete}
               title="Delete"
             >
-              🗑
+              <Trash2 className="w-4 h-4" />
             </button>
           </>
         )}
