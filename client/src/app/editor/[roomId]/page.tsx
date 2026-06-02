@@ -322,6 +322,19 @@ export default function EditorPage() {
       return;
     }
 
+    const isText = active.type === "textbox" || active.type === "i-text" || active.type === "text";
+    
+    // Auto-clear default text immediately when selected
+    if (isText && active.text === "Ketik di sini") {
+      active.set("text", "");
+      if (active.hiddenTextarea) {
+        active.hiddenTextarea.value = "";
+      }
+      active.dirty = true;
+      canvas.requestRenderAll();
+    }
+
+    // Fabric temporarily removes editing text from groups, so we check if it has a group
     const bound = active.group ? active.group.getBoundingRect() : active.getBoundingRect();
     const wrapper = getWrapperBySide(side);
     if (!wrapper) return;
@@ -329,11 +342,10 @@ export default function EditorPage() {
     // Account for canvas zoom
     const zoom = canvas.getZoom?.() ?? 1;
 
-    // Calculate position relative to wrapper
+    // Calculate position relative to wrapper (subtract 30px to ensure it floats well above the bounding box)
     const x = (bound.left + bound.width / 2) * zoom;
-    const y = bound.top * zoom - 8; // 8px gap above
+    const y = bound.top * zoom - 30; 
 
-    const isText = active.type === "textbox" || active.type === "i-text" || active.type === "text";
     let textProps = undefined;
     if (isText) {
       textProps = {
@@ -1166,6 +1178,10 @@ export default function EditorPage() {
           if (e.target && (e.target.type === "textbox" || e.target.type === "i-text" || e.target.type === "text")) {
             if (e.target.text === "Ketik di sini") {
               e.target.set("text", "");
+              if (e.target.hiddenTextarea) {
+                e.target.hiddenTextarea.value = "";
+              }
+              e.target.dirty = true;
               e.target.canvas?.requestRenderAll();
             }
           }
