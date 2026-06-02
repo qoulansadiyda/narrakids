@@ -1162,6 +1162,15 @@ export default function EditorPage() {
         const onMovingLeft = () => updateToolbarPosition(left, "left");
         const onMovingRight = () => updateToolbarPosition(right, "right");
 
+        const onEditingEntered = (e: any) => {
+          if (e.target && (e.target.type === "textbox" || e.target.type === "i-text" || e.target.type === "text")) {
+            if (e.target.text === "Ketik di sini") {
+              e.target.set("text", "");
+              e.target.canvas?.requestRenderAll();
+            }
+          }
+        };
+
         left.on("selection:created", onSelectLeft);
         left.on("selection:updated", onSelectLeft);
         left.on("selection:cleared", onDeselectLeft);
@@ -1175,6 +1184,9 @@ export default function EditorPage() {
         right.on("object:moving", onMovingRight);
         right.on("object:scaling", onMovingRight);
         right.on("object:rotating", onMovingRight);
+        right.on("editing:entered", onEditingEntered);
+
+        left.on("editing:entered", onEditingEntered);
 
         (left as any)._onSelect = onSelectLeft;
         (left as any)._onDeselect = onDeselectLeft;
@@ -2047,6 +2059,15 @@ function FloatingToolbar({
                 onChange={(e) => onTextPropChange("fill", e.target.value)}
                 title="Text Color"
               />
+              {/* Delete Text */}
+              <button
+                type="button"
+                className="w-8 h-8 flex items-center justify-center rounded hover:bg-red-600 transition-colors text-sm cursor-pointer text-red-400 hover:text-white ml-2 border-l border-zinc-600 pl-2"
+                onClick={onDelete}
+                title="Delete"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
             </div>
           </>
         )}
