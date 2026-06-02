@@ -322,7 +322,7 @@ export default function EditorPage() {
       return;
     }
 
-    const bound = active.getBoundingRect();
+    const bound = active.group ? active.group.getBoundingRect() : active.getBoundingRect();
     const wrapper = getWrapperBySide(side);
     if (!wrapper) return;
 
@@ -1184,9 +1184,9 @@ export default function EditorPage() {
         right.on("object:moving", onMovingRight);
         right.on("object:scaling", onMovingRight);
         right.on("object:rotating", onMovingRight);
-        right.on("editing:entered", onEditingEntered);
+        right.on("text:editing:entered", onEditingEntered);
 
-        left.on("editing:entered", onEditingEntered);
+        left.on("text:editing:entered", onEditingEntered);
 
         (left as any)._onSelect = onSelectLeft;
         (left as any)._onDeselect = onDeselectLeft;
