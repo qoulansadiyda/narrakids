@@ -60,5 +60,8 @@ export const ASSET_REGISTRY: Record<AssetCategory, AssetItem[]> = {
     { id: "sfx-birds", name: "Birds", src: "/assets/audio/sfx-birds.mp3", category: "sfx" },
     { id: "sfx-thunder", name: "Thunder", src: "/assets/audio/sfx-thunder.mp3", category: "sfx" },
     { id: "sfx-laugh", name: "Laugh", src: "/assets/audio/sfx-laugh.mp3", category: "sfx" },
+    { id: "sfx-clock", name: "Clock", src: "/assets/audio/sfx-clock.mp3", category: "sfx" },
+    { id: "sfx-done", name: "Done", src: "/assets/audio/sfx-done.mp3", category: "sfx" },
+    { id: "sfx-page-turn", name: "Page Turn", src: "/assets/audio/sfx-page-turn.mp3", category: "sfx" },
   ],
 };
