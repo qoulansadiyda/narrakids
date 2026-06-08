@@ -171,7 +171,11 @@ router.delete('/profile', async (req, res) => {
     res.json({ ok: true });
   } catch (e) {
     console.error("Error deleting account:", e);
-    res.status(500).json({ error: 'Server error' });
+    // Ignore P2025 error if user is already deleted
+    if (e.code === 'P2025') {
+      return res.json({ ok: true });
+    }
+    res.status(500).json({ error: e.message || 'Server error' });
   }
 });
 
