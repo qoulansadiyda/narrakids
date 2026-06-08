@@ -147,12 +147,30 @@ router.delete('/profile', async (req, res) => {
       return res.status(401).json({ error: 'Token sudah kedaluwarsa, silakan login ulang' });
     }
 
+    // Programmatic cascade delete to bypass foreign key constraint issues if DB is not migrated
+    const userBooks = await prisma.book.findMany({
+      where: { userId: payload.sub },
+      select: { id: true }
+    });
+    
+    const bookIds = userBooks.map(b => b.id);
+
+    if (bookIds.length > 0) {
+      await prisma.bookPage.deleteMany({
+        where: { bookId: { in: bookIds } }
+      });
+      await prisma.book.deleteMany({
+        where: { userId: payload.sub }
+      });
+    }
+
     await prisma.user.delete({
       where: { id: payload.sub }
     });
 
     res.json({ ok: true });
   } catch (e) {
+    console.error("Error deleting account:", e);
     res.status(500).json({ error: 'Server error' });
   }
 });
